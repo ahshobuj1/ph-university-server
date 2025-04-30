@@ -38,7 +38,7 @@ const studentSchema = new Schema<Student>({
     enum: ['isActive', 'blocked'],
     default: 'active',
   },
-  gender: { type: String, required: true },
+  gender: { type: String, required: true, enum: ['male', 'female', 'others'] },
   blood: {
     type: String,
     enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],

@@ -13,9 +13,7 @@ app.use(cors());
 app.use('/api/v1/students', studentRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send(
-    'Hello World! This my first project , Initial project template,Cloned',
-  );
+  res.send('Hello World! This my first project , Initial project template');
 });
 
 export default app;
