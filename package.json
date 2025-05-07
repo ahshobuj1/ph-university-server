@@ -21,7 +21,7 @@
     "joi": "^17.13.3",
     "mongoose": "^8.14.0",
     "ts-node-dev": "^2.0.0",
-    "zod": "^3.24.3"
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",

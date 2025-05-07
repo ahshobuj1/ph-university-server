@@ -10,7 +10,7 @@ export type Student = {
   matherContact: string;
   fatherContact: string;
   contact: string;
-  blood: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  blood?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   permanentAddress: UserAddress;
   localAddress: UserAddress;
   isActive: 'active' | 'blocked';

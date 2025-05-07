@@ -35,7 +35,7 @@ const studentSchema = new Schema<Student>({
   matherContact: { type: String, required: true },
   isActive: {
     type: String,
-    enum: ['isActive', 'blocked'],
+    enum: ['active', 'blocked'],
     default: 'active',
   },
   gender: { type: String, required: true, enum: ['male', 'female', 'others'] },
