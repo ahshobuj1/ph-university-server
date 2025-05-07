@@ -2,6 +2,11 @@ import { Student } from './student.interface';
 import { StudentModel } from './student.model';
 
 const createStudent = async (student: Student) => {
+  // check user exist in the db
+  if (await StudentModel.isUserExists(student.email)) {
+    throw new Error('User already exists');
+  }
+
   const result = await StudentModel.create(student);
   return result;
 };

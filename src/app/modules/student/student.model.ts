@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { Student } from './student.interface';
+import { StaticsStudentModel, Student } from './student.interface';
 
 const nameSchema = new Schema({
   firstName: {
@@ -22,7 +22,7 @@ const addressSchema = new Schema({
   town: { type: String, required: true },
 });
 
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<Student, StaticsStudentModel>({
   registration: { type: String, required: true },
   roll: { type: String, required: true },
   name: { type: nameSchema, required: true },
@@ -47,4 +47,13 @@ const studentSchema = new Schema<Student>({
   localAddress: { type: addressSchema, required: true },
 });
 
-export const StudentModel = model<Student>('student', studentSchema);
+//create a custom statics method,  Add static method BEFORE creating the model
+studentSchema.statics.isUserExists = async function (email: string) {
+  const existingUser = await StudentModel.findOne({ email });
+  return existingUser;
+};
+
+export const StudentModel = model<Student, StaticsStudentModel>(
+  'student',
+  studentSchema,
+);
