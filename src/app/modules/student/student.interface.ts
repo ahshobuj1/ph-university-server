@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 export type Student = {
   registration: string;
   roll: string;
+  password: string;
   name: UserName;
   email: string;
   gender: 'male' | 'female' | 'others';

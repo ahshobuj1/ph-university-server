@@ -1,5 +1,7 @@
+import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { StaticsStudentModel, Student } from './student.interface';
+import config from '../../config';
 
 const nameSchema = new Schema({
   firstName: {
@@ -25,6 +27,7 @@ const addressSchema = new Schema({
 const studentSchema = new Schema<Student, StaticsStudentModel>({
   registration: { type: String, required: true },
   roll: { type: String, required: true },
+  password: { type: String, required: true },
   name: { type: nameSchema, required: true },
   age: { type: Number, required: true },
   email: { type: String, required: true },
@@ -45,6 +48,22 @@ const studentSchema = new Schema<Student, StaticsStudentModel>({
   },
   permanentAddress: { type: addressSchema, required: true },
   localAddress: { type: addressSchema, required: true },
+});
+
+// create pre middlewares before save data
+studentSchema.pre('save', async function () {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const student = this;
+
+  student.password = await bcrypt.hash(
+    student.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+});
+
+// create post middlewares after save data
+studentSchema.post('save', function () {
+  this.password = '';
 });
 
 //create a custom statics method,  Add static method BEFORE creating the model
