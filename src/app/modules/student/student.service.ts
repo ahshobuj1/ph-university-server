@@ -21,8 +21,17 @@ const getStudentById = async (id: string) => {
   return result;
 };
 
+const deleteSingleStudent = async (id: string) => {
+  const result = await StudentModel.updateOne(
+    { _id: id },
+    { $set: { isDeleted: true } },
+  );
+  return result;
+};
+
 export const studentService = {
   createStudent,
   getAllStudents,
   getStudentById,
+  deleteSingleStudent,
 };

@@ -17,6 +17,7 @@ export type Student = {
   permanentAddress: UserAddress;
   localAddress: UserAddress;
   isActive: 'active' | 'blocked';
+  isDeleted?: boolean;
 };
 
 export type UserName = {

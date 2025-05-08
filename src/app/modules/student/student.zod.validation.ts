@@ -173,6 +173,7 @@ const studentValidationWithZod = z.object({
       invalid_type_error: "Status must be either 'active' or 'blocked'",
     })
     .default('active'),
+  isDeleted: z.boolean().optional(),
 });
 
 export default studentValidationWithZod;
