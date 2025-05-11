@@ -1,7 +1,7 @@
-import { Student } from './student.interface';
+import { TStudent } from './student.interface';
 import { StudentModel } from './student.model';
 
-const createStudent = async (student: Student) => {
+const createStudent = async (student: TStudent) => {
   // check user exist in the db
   if (await StudentModel.isUserExists(student.email)) {
     throw new Error('User already exists');

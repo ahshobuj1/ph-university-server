@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 
-export type Student = {
+export type TStudent = {
   registration: string;
   roll: string;
   password: string;
@@ -35,7 +35,7 @@ export type UserAddress = {
 
 //create a statics user model
 
-export interface StaticsStudentModel extends Model<Student> {
+export interface StaticsStudentModel extends Model<TStudent> {
   // eslint-disable-next-line no-unused-vars
-  isUserExists(email: string): Promise<Student | null>;
+  isUserExists(email: string): Promise<TStudent | null>;
 }

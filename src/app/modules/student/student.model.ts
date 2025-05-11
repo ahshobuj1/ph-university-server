@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
-import { StaticsStudentModel, Student } from './student.interface';
+import { StaticsStudentModel, TStudent } from './student.interface';
 import config from '../../config';
 
 const nameSchema = new Schema({
@@ -24,7 +24,7 @@ const addressSchema = new Schema({
   town: { type: String, required: true },
 });
 
-const studentSchema = new Schema<Student, StaticsStudentModel>({
+const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   registration: { type: String, required: true },
   roll: { type: String, required: true },
   password: { type: String, required: true },
@@ -91,7 +91,7 @@ studentSchema.statics.isUserExists = async function (email: string) {
   return existingUser;
 };
 
-export const StudentModel = model<Student, StaticsStudentModel>(
+export const StudentModel = model<TStudent, StaticsStudentModel>(
   'student',
   studentSchema,
 );
