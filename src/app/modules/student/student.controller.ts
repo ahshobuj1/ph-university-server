@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { studentService } from './student.service';
+import sendResponse from '../../utils/sendresponse';
 
 // import { studentValidationSchemaWithJoi } from './student.validation.joi';
 
@@ -31,10 +32,9 @@ const getStudentById = async (
     const id = req.params.id;
     const result = await studentService.getStudentById(id);
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: 'Student got successfully',
-      data: result,
+      result,
     });
   } catch (err) {
     next(err);
@@ -50,10 +50,9 @@ const deleteSingleStudent = async (
     const id = req.params.id;
     const result = await studentService.deleteSingleStudent(id);
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: 'Student deleted successfully',
-      data: result,
+      result,
     });
   } catch (err) {
     next(err);
