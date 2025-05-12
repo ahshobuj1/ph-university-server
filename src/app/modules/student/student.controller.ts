@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { studentService } from './student.service';
-import sendResponse from '../../utils/sendresponse';
+import sendResponse from '../../utils/sendResponse';
 
 // import { studentValidationSchemaWithJoi } from './student.validation.joi';
 
