@@ -25,6 +25,8 @@ const addressSchema = new Schema({
 });
 
 const studentSchema = new Schema<TStudent, StaticsStudentModel>({
+  id: { type: String },
+  user: { type: Schema.Types.ObjectId, unique: true, ref: 'UserModel' },
   registration: { type: String, required: true },
   roll: { type: String, required: true },
   password: { type: String, required: true },
@@ -36,11 +38,6 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   motherName: { type: String, required: true },
   fatherContact: { type: String, required: true },
   matherContact: { type: String, required: true },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
   gender: { type: String, required: true, enum: ['male', 'female', 'others'] },
   blood: {
     type: String,

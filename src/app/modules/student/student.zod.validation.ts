@@ -167,12 +167,6 @@ const studentValidationWithZod = z.object({
 
   permanentAddress: userAddressZod,
   localAddress: userAddressZod,
-
-  isActive: z
-    .enum(['active', 'blocked'], {
-      invalid_type_error: "Status must be either 'active' or 'blocked'",
-    })
-    .default('active'),
   isDeleted: z.boolean().optional(),
 });
 

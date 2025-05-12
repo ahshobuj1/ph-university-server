@@ -1,6 +1,8 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type TStudent = {
+  id: string;
+  user: Types.ObjectId;
   registration: string;
   roll: string;
   password: string;
@@ -16,7 +18,6 @@ export type TStudent = {
   blood?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   permanentAddress: UserAddress;
   localAddress: UserAddress;
-  isActive: 'active' | 'blocked';
   isDeleted?: boolean;
 };
 
