@@ -1,11 +1,28 @@
 import { Model, Types } from 'mongoose';
 
+// export type TStudent = {
+//   id: string;
+//   user: Types.ObjectId;
+//   name: UserName;
+//   email: string;
+//   gender: 'male' | 'female' | 'others';
+//   age: number;
+// dateOfBirth: Date;
+//   guardian: string;
+//   localGuardian: string;
+//   contact: string;
+//   emergencyContact: string;
+//   blood?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+//   permanentAddress: UserAddress;
+//   localAddress: UserAddress;
+//   isDeleted?: boolean;
+// };
+
 export type TStudent = {
   id: string;
   user: Types.ObjectId;
   registration: string;
   roll: string;
-  password: string;
   name: UserName;
   email: string;
   gender: 'male' | 'female' | 'others';

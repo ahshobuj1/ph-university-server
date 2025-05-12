@@ -80,15 +80,6 @@ const studentValidationWithZod = z.object({
     .min(1, 'Roll number cannot be empty')
     .max(50, 'Roll number cannot exceed 50 characters'),
 
-  password: z
-    .string({
-      required_error: 'password is required',
-      invalid_type_error: 'password must be a string',
-    })
-
-    .min(6, 'password cannot be less then 6 characters')
-    .max(20, 'password cannot exceed 20 characters'),
-
   name: userNameZod,
 
   email: z

@@ -1,7 +1,5 @@
-import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import { StaticsStudentModel, TStudent } from './student.interface';
-import config from '../../config';
 
 const nameSchema = new Schema({
   firstName: {
@@ -29,7 +27,6 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   user: { type: Schema.Types.ObjectId, unique: true, ref: 'UserModel' },
   registration: { type: String, required: true },
   roll: { type: String, required: true },
-  password: { type: String, required: true },
   name: { type: nameSchema, required: true },
   age: { type: Number, required: true },
   email: { type: String, required: true },
@@ -48,24 +45,6 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   isDeleted: { type: Boolean },
 });
 
-// create pre middlewares before save data
-studentSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const student = this;
-
-  student.password = await bcrypt.hash(
-    student.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next();
-});
-
-// create post middlewares after save data
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
-
 //create query middlewares
 studentSchema.pre('find', async function (next) {
   this.find({ isDeleted: { $ne: true } });
@@ -76,11 +55,6 @@ studentSchema.pre('findOne', async function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
-
-// studentSchema.pre('aggregate', async function (next) {
-//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-//   next();
-// });
 
 //create a custom statics method,  Add static method BEFORE creating the model
 studentSchema.statics.isUserExists = async function (email: string) {

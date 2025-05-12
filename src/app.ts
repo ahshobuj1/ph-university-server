@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { studentRoutes } from './app/modules/student/student.routes';
 import { userRoutes } from './app/modules/user/user.routes';
+import { globalErrorHandler } from './app/middlewares/globalErrorHandler';
 
 const app: Application = express();
 
@@ -20,5 +21,7 @@ app.get('/', (req: Request, res: Response) => {
     message: 'Hello World! This my first project , Initial project template',
   });
 });
+
+app.use(globalErrorHandler);
 
 export default app;
