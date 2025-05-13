@@ -18,6 +18,7 @@ const createStudent = async (password: string, student: TStudent) => {
   if (Object.keys(createUser).length) {
     student.id = generatedId;
     student.user = createUser._id;
+    student.isDeleted = createUser.isDeleted;
 
     const newStudent = await StudentModel.create(student);
     return newStudent;

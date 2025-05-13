@@ -61,104 +61,88 @@ const userAddressZod = z.object({
     .max(100, 'Town cannot exceed 100 characters'),
 });
 
-const studentValidationWithZod = z.object({
-  registration: z
-    .string({
-      required_error: 'Registration number is required',
-      invalid_type_error: 'Registration must be a string',
-    })
-    .trim()
-    .min(1, 'Registration number cannot be empty')
-    .max(50, 'Registration number cannot exceed 50 characters'),
+const createStudentValidationsSchema = z.object({
+  student: z.object({
+    name: userNameZod,
+    email: z
+      .string({
+        required_error: 'Email is required',
+        invalid_type_error: 'Email must be a string',
+      })
+      .email('Invalid email address')
+      .trim()
+      .toLowerCase()
+      .max(100, 'Email cannot exceed 100 characters'),
 
-  roll: z
-    .string({
-      required_error: 'Roll number is required',
-      invalid_type_error: 'Roll number must be a string',
-    })
-    .trim()
-    .min(1, 'Roll number cannot be empty')
-    .max(50, 'Roll number cannot exceed 50 characters'),
+    gender: z.enum(['male', 'female', 'others'], {
+      required_error: 'Gender is required',
+      invalid_type_error: "Gender must be either 'male', 'female' or 'others'",
+    }),
 
-  name: userNameZod,
+    age: z
+      .number({
+        required_error: 'Age is required',
+        invalid_type_error: 'Age must be a number',
+      })
+      .int('Age must be an integer')
+      .positive('Age must be a positive number')
+      .max(120, 'Age cannot exceed 120 years'),
 
-  email: z
-    .string({
-      required_error: 'Email is required',
-      invalid_type_error: 'Email must be a string',
-    })
-    .email('Invalid email address')
-    .trim()
-    .toLowerCase()
-    .max(100, 'Email cannot exceed 100 characters'),
+    motherName: z
+      .string({
+        required_error: "Mother's name is required",
+        invalid_type_error: "Mother's name must be a string",
+      })
+      .min(1, "Mother's name cannot be empty")
+      .max(100, "Mother's name cannot exceed 100 characters"),
 
-  gender: z.enum(['male', 'female', 'others'], {
-    required_error: 'Gender is required',
-    invalid_type_error: "Gender must be either 'male', 'female' or 'others'",
+    fatherName: z
+      .string({
+        required_error: "Father's name is required",
+        invalid_type_error: "Father's name must be a string",
+      })
+      .min(1, "Father's name cannot be empty")
+      .max(100, "Father's name cannot exceed 100 characters"),
+
+    matherContact: z
+      .string({
+        required_error: "Mother's contact is required",
+        invalid_type_error: "Mother's contact must be a string",
+      })
+      .trim()
+      .min(1, "Mother's contact cannot be empty")
+      .max(20, "Mother's contact cannot exceed 20 characters"),
+
+    fatherContact: z
+      .string({
+        required_error: "Father's contact is required",
+        invalid_type_error: "Father's contact must be a string",
+      })
+      .trim()
+      .min(1, "Father's contact cannot be empty")
+      .max(20, "Father's contact cannot exceed 20 characters"),
+
+    contact: z
+      .string({
+        required_error: 'Contact number is required',
+        invalid_type_error: 'Contact must be a string',
+      })
+      .trim()
+      .min(1, 'Contact number cannot be empty')
+      .max(20, 'Contact number cannot exceed 20 characters'),
+
+    blood: z
+      .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+        invalid_type_error:
+          'Blood group must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-',
+      })
+      .optional(),
+
+    permanentAddress: userAddressZod,
+    localAddress: userAddressZod,
   }),
-
-  age: z
-    .number({
-      required_error: 'Age is required',
-      invalid_type_error: 'Age must be a number',
-    })
-    .int('Age must be an integer')
-    .positive('Age must be a positive number')
-    .max(120, 'Age cannot exceed 120 years'),
-
-  motherName: z
-    .string({
-      required_error: "Mother's name is required",
-      invalid_type_error: "Mother's name must be a string",
-    })
-    .min(1, "Mother's name cannot be empty")
-    .max(100, "Mother's name cannot exceed 100 characters"),
-
-  fatherName: z
-    .string({
-      required_error: "Father's name is required",
-      invalid_type_error: "Father's name must be a string",
-    })
-    .min(1, "Father's name cannot be empty")
-    .max(100, "Father's name cannot exceed 100 characters"),
-
-  matherContact: z
-    .string({
-      required_error: "Mother's contact is required",
-      invalid_type_error: "Mother's contact must be a string",
-    })
-    .trim()
-    .min(1, "Mother's contact cannot be empty")
-    .max(20, "Mother's contact cannot exceed 20 characters"),
-
-  fatherContact: z
-    .string({
-      required_error: "Father's contact is required",
-      invalid_type_error: "Father's contact must be a string",
-    })
-    .trim()
-    .min(1, "Father's contact cannot be empty")
-    .max(20, "Father's contact cannot exceed 20 characters"),
-
-  contact: z
-    .string({
-      required_error: 'Contact number is required',
-      invalid_type_error: 'Contact must be a string',
-    })
-    .trim()
-    .min(1, 'Contact number cannot be empty')
-    .max(20, 'Contact number cannot exceed 20 characters'),
-
-  blood: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-      invalid_type_error:
-        'Blood group must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-',
-    })
-    .optional(),
-
-  permanentAddress: userAddressZod,
-  localAddress: userAddressZod,
-  isDeleted: z.boolean().optional(),
 });
 
-export default studentValidationWithZod;
+export const studentValidations = {
+  createStudentValidationsSchema,
+};

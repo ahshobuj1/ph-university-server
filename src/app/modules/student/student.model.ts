@@ -25,8 +25,6 @@ const addressSchema = new Schema({
 const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   id: { type: String },
   user: { type: Schema.Types.ObjectId, unique: true, ref: 'UserModel' },
-  registration: { type: String, required: true },
-  roll: { type: String, required: true },
   name: { type: nameSchema, required: true },
   age: { type: Number, required: true },
   email: { type: String, required: true },
