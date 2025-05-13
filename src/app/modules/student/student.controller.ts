@@ -1,63 +1,41 @@
-import { NextFunction, Request, Response } from 'express';
 import { studentService } from './student.service';
 import sendResponse from '../../utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
 
 // import { studentValidationSchemaWithJoi } from './student.validation.joi';
 
-const getAllStudents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const result = await studentService.getAllStudents();
+// Higher-order func
 
-    res.status(200).json({
-      success: true,
-      message: 'All students got successfully',
-      length: result.length,
-      data: result,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const getAllStudents = catchAsync(async (req, res) => {
+  const result = await studentService.getAllStudents();
 
-const getStudentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const id = req.params.id;
-    const result = await studentService.getStudentById(id);
+  res.status(200).json({
+    success: true,
+    message: 'All students got successfully',
+    length: result.length,
+    data: result,
+  });
+});
 
-    sendResponse(res, {
-      message: 'Student got successfully',
-      result,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const getStudentById = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await studentService.getStudentById(id);
 
-const deleteSingleStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const id = req.params.id;
-    const result = await studentService.deleteSingleStudent(id);
+  sendResponse(res, {
+    message: 'Student got successfully',
+    result,
+  });
+});
 
-    sendResponse(res, {
-      message: 'Student deleted successfully',
-      result,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const deleteSingleStudent = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await studentService.deleteSingleStudent(id);
+
+  sendResponse(res, {
+    message: 'Student deleted successfully',
+    result,
+  });
+});
 
 export const studentController = {
   getAllStudents,
