@@ -5,10 +5,12 @@ import { semesterValidations } from './semester.validation';
 
 const router = Router();
 
-router.use(
+router.post(
   '/create-semester',
   validationChecker(semesterValidations.createSemesterValidation),
   semesterController.createSemester,
 );
+
+router.get('/:id', semesterController.getSemesterById);
 
 export const semesterRoutes = router;

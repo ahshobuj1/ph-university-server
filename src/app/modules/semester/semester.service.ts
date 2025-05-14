@@ -12,6 +12,12 @@ const createSemester = async (semester: TSemester) => {
   return result;
 };
 
+const getSemesterById = async (id: string) => {
+  const result = await SemesterModel.findById(id);
+  return result;
+};
+
 export const semesterService = {
   createSemester,
+  getSemesterById,
 };
