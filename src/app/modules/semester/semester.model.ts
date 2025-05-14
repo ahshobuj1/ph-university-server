@@ -1,20 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { TSemester } from './semester.interface';
-
-export const semesterMonthSchema = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+import { semesterMonthSchema, semesterNameCodeMap } from './semester.constant';
 
 const semesterSchema = new Schema<TSemester>(
   {
@@ -22,6 +8,12 @@ const semesterSchema = new Schema<TSemester>(
     code: {
       type: String,
       enum: ['01', '02', '03'],
+      validate: {
+        validator: function (code: string) {
+          return semesterNameCodeMap[this.name] === code;
+        },
+        message: 'Invalid code for semester name',
+      },
     },
     year: { type: String },
     startMonth: { type: String, enum: semesterMonthSchema },

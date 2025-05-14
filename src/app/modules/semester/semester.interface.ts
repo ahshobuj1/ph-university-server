@@ -1,16 +1,4 @@
-export type TMonth =
-  | 'January'
-  | 'February'
-  | 'March'
-  | 'April'
-  | 'May'
-  | 'June'
-  | 'July'
-  | 'August'
-  | 'September'
-  | 'October'
-  | 'November'
-  | 'December';
+import { TMonth } from './semester.constant';
 
 export type TSemester = {
   name: 'Autumn' | 'Summer' | 'Fall';
@@ -18,4 +6,10 @@ export type TSemester = {
   code: '01' | '02' | '03';
   startMonth: TMonth;
   endMonth: TMonth;
+};
+
+export type TSemesterNameCode = {
+  Autumn: '01';
+  Summer: '02';
+  Fall: '03';
 };

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { semesterMonthSchema } from './semester.model';
+import { semesterMonthSchema } from './semester.constant';
 
 const createSemesterValidation = z.object({
   name: z.enum(['Autumn', 'Summer', 'Fall']),
