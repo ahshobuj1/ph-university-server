@@ -16,10 +16,25 @@ export const semesterMonthSchema = [
   'December',
 ];
 
+const semesterNameCodeMap: Record<string, string> = {
+  Autumn: '01',
+  Summer: '02',
+  Fall: '03',
+};
+
 const semesterSchema = new Schema<TSemester>(
   {
     name: { type: String, enum: ['Autumn', 'Summer', 'Fall'] },
-    code: { type: String, enum: ['01', '02', '03'] },
+    code: {
+      type: String,
+      enum: ['01', '02', '03'],
+      validate: {
+        validator: function (code: string) {
+          return semesterNameCodeMap[this.name] === code;
+        },
+        message: 'Invalid code for semester name',
+      },
+    },
     year: { type: String },
     startMonth: { type: String, enum: semesterMonthSchema },
     endMonth: { type: String, enum: semesterMonthSchema },
