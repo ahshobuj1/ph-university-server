@@ -37,15 +37,18 @@ const createStudent = async (password: string, student: TStudent) => {
     student.user = createUser[0]._id;
 
     const newStudent = await StudentModel.create([student], { session });
+    if (!newStudent.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'failed to create student');
+    }
 
-    session.commitTransaction(); // step -> 2
-    session.endSession(); // end session
+    await session.commitTransaction(); // step -> 2
+    await session.endSession(); // end session
 
     return newStudent;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    session.abortTransaction(); // step -> 3
-    session.endSession(); // end session
+    await session.abortTransaction(); // step -> 3
+    await session.endSession(); // end session
     throw new Error(err);
   }
 };

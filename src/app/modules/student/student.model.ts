@@ -1,5 +1,7 @@
+import httpStatus from 'http-status';
 import { Schema, model } from 'mongoose';
 import { StaticsStudentModel, TStudent } from './student.interface';
+import { AppError } from '../../errors/AppError';
 
 const nameSchema = new Schema({
   firstName: {
@@ -43,6 +45,17 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   permanentAddress: { type: addressSchema, required: true },
   localAddress: { type: addressSchema, required: true },
   isDeleted: { type: Boolean, default: false },
+});
+
+// check student exist before delete
+studentSchema.pre('findOneAndUpdate', async function (next) {
+  const { id } = this.getQuery();
+  const isExistsStudent = await StudentModel.findOne({ id });
+
+  if (!isExistsStudent) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'student does not exists');
+  }
+  next();
 });
 
 //create query middlewares
