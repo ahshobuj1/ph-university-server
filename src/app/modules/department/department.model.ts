@@ -11,11 +11,23 @@ const departmentSchema = new Schema<TDepartment>(
   },
 );
 
+// use pre hooks middleware
 departmentSchema.pre('save', async function (next) {
   const isExistsDepartment = await DepartmentModel.findOne({ name: this.name });
 
   if (isExistsDepartment) {
     throw new Error('Department is already exists');
+  }
+  next();
+});
+
+//use query middleware to check id is exists in the bd
+departmentSchema.pre('findOneAndUpdate', async function (next) {
+  const id = this.getQuery();
+  const isExistsId = await DepartmentModel.findById(id);
+
+  if (!isExistsId) {
+    throw new Error('Department does not exists, Insert correct id');
   }
   next();
 });

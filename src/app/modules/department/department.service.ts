@@ -17,7 +17,7 @@ const getSingleDepartment = async (id: string) => {
 };
 
 const updateDepartment = async (id: string, payload: Partial<TDepartment>) => {
-  const result = await DepartmentModel.findByIdAndUpdate(id, payload);
+  const result = await DepartmentModel.findOneAndUpdate({ _id: id }, payload);
   return result;
 };
 
