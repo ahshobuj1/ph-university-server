@@ -10,7 +10,7 @@ const createStudent = async (password: string, student: TStudent) => {
   const getSemester = await SemesterModel.findById(student.semester);
 
   // student id
-  const generatedStudentId = await createStudentId(getSemester);
+  const generatedStudentId = await createStudentId(getSemester!);
 
   const userData: Partial<TUser> = {
     id: generatedStudentId,

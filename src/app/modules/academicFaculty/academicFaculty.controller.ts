@@ -1,0 +1,37 @@
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { academicFacultyService } from './academicFaculty.service';
+
+const createAcademicFaculty = catchAsync(async (req, res) => {
+  const result = await academicFacultyService.createAcademicFaculty(req.body);
+
+  sendResponse(res, {
+    message: 'Academic Faculty is created successfully',
+    result,
+  });
+});
+
+const getAcademicFaculties = catchAsync(async (req, res) => {
+  const result = await academicFacultyService.getAcademicFaculties();
+
+  sendResponse(res, {
+    message: 'Academic Faculty got successfully',
+    result,
+  });
+});
+
+const getSingleAcademicFaculty = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await academicFacultyService.getSingleAcademicFaculty(id);
+
+  sendResponse(res, {
+    message: 'Academic Faculty got successfully',
+    result,
+  });
+});
+
+export const academicFacultyController = {
+  createAcademicFaculty,
+  getAcademicFaculties,
+  getSingleAcademicFaculty,
+};
