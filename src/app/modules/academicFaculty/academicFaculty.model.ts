@@ -1,5 +1,7 @@
+import httpStatus from 'http-status';
 import { model, Schema } from 'mongoose';
 import { TAcademicFaculty } from './academicFaculty.interface';
+import { AppError } from '../../errors/AppError';
 
 const academicFacultySchema = new Schema<TAcademicFaculty>(
   {
@@ -16,7 +18,7 @@ academicFacultySchema.pre('save', async function (next) {
   });
 
   if (isExistsFaculty) {
-    throw new Error('Faculty name is already exists');
+    throw new AppError(httpStatus.CONFLICT, 'Faculty name is already exists');
   }
   next();
 });

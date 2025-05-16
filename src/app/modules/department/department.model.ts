@@ -1,5 +1,7 @@
+import httpStatus from 'http-status';
 import { model, Schema } from 'mongoose';
 import { TDepartment } from './department.interface';
+import { AppError } from '../../errors/AppError';
 
 const departmentSchema = new Schema<TDepartment>(
   {
@@ -19,7 +21,7 @@ departmentSchema.pre('save', async function (next) {
   const isExistsDepartment = await DepartmentModel.findOne({ name: this.name });
 
   if (isExistsDepartment) {
-    throw new Error('Department is already exists');
+    throw new AppError(httpStatus.CONFLICT, 'Department is already exists');
   }
   next();
 });
@@ -30,7 +32,10 @@ departmentSchema.pre('findOneAndUpdate', async function (next) {
   const isExistsId = await DepartmentModel.findById(id);
 
   if (!isExistsId) {
-    throw new Error('Department does not exists, Insert correct id');
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Department does not exists, Insert correct id',
+    );
   }
   next();
 });
