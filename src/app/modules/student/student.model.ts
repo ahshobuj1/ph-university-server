@@ -42,7 +42,7 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>({
   },
   permanentAddress: { type: addressSchema, required: true },
   localAddress: { type: addressSchema, required: true },
-  isDeleted: { type: Boolean },
+  isDeleted: { type: Boolean, default: false },
 });
 
 //create query middlewares
