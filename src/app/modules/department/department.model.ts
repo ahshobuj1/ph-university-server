@@ -4,7 +4,10 @@ import { TDepartment } from './department.interface';
 const departmentSchema = new Schema<TDepartment>(
   {
     name: { type: String, required: true, unique: true },
-    academicFaculty: { type: Schema.Types.ObjectId, required: true },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
+    },
   },
   {
     timestamps: true,
