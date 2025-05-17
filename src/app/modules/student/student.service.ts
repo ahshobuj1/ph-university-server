@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { StudentModel } from './student.model';
 import { AppError } from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
+import { TStudent } from './student.interface';
 
 const getAllStudents = async () => {
   const result = await StudentModel.find()
@@ -18,7 +19,7 @@ const getAllStudents = async () => {
 };
 
 const getStudentById = async (id: string) => {
-  const result = await StudentModel.findOne({ _id: id })
+  const result = await StudentModel.findOne({ id: id })
     .populate('user')
     .populate('semester')
     .populate({
@@ -27,6 +28,39 @@ const getStudentById = async (id: string) => {
         path: 'academicFaculty',
       },
     });
+  return result;
+};
+
+const updateStudent = async (id: string, payload: Partial<TStudent>) => {
+  const { name, permanentAddress, localAddress, ...primitiveStudentData } =
+    payload;
+
+  const modifiedUpdatedStudentData: Record<string, unknown> = {
+    ...primitiveStudentData,
+  };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedStudentData[`name.${key}`] = value;
+    }
+  }
+
+  if (localAddress && Object.keys(localAddress).length) {
+    for (const [key, value] of Object.entries(localAddress)) {
+      modifiedUpdatedStudentData[`localAddress.${key}`] = value;
+    }
+  }
+
+  if (permanentAddress && Object.keys(permanentAddress).length) {
+    for (const [key, value] of Object.entries(permanentAddress)) {
+      modifiedUpdatedStudentData[`permanentAddress.${key}`] = value;
+    }
+  }
+
+  const result = await StudentModel.findOneAndUpdate(
+    { id },
+    modifiedUpdatedStudentData,
+  );
   return result;
 };
 
@@ -73,4 +107,5 @@ export const studentService = {
   getAllStudents,
   getStudentById,
   deleteSingleStudent,
+  updateStudent,
 };
