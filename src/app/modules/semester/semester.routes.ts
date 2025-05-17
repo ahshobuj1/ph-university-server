@@ -11,6 +11,13 @@ router.post(
   semesterController.createSemester,
 );
 
+router.get('/', semesterController.getAllSemester);
 router.get('/:id', semesterController.getSemesterById);
+
+router.patch(
+  '/:id',
+  validationChecker(semesterValidations.updateSemesterValidation),
+  semesterController.updateSemester,
+);
 
 export const semesterRoutes = router;

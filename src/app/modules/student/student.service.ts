@@ -61,6 +61,11 @@ const updateStudent = async (id: string, payload: Partial<TStudent>) => {
     { id },
     modifiedUpdatedStudentData,
   );
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update student');
+  }
+
   return result;
 };
 

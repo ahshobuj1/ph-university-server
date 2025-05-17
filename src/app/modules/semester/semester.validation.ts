@@ -9,6 +9,15 @@ const createSemesterValidation = z.object({
   endMonth: z.enum(semesterMonthSchema as [string, ...string[]]),
 });
 
+const updateSemesterValidation = z.object({
+  name: z.enum(['Autumn', 'Summer', 'Fall']).optional(),
+  code: z.enum(['01', '02', '03']).optional(),
+  year: z.string().optional(),
+  startMonth: z.enum(semesterMonthSchema as [string, ...string[]]).optional(),
+  endMonth: z.enum(semesterMonthSchema as [string, ...string[]]).optional(),
+});
+
 export const semesterValidations = {
   createSemesterValidation,
+  updateSemesterValidation,
 };

@@ -39,4 +39,15 @@ semesterSchema.pre('save', async function (next) {
   next();
 });
 
+// check is exists with query middleware when try to update
+semesterSchema.pre('findOneAndUpdate', async function (next) {
+  const { _id } = this.getQuery();
+
+  const isExists = await SemesterModel.findById(_id);
+  if (!isExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Invalid semester id');
+  }
+  next();
+});
+
 export const SemesterModel = model<TSemester>('Semester', semesterSchema);
