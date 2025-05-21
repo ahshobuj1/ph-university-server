@@ -49,9 +49,16 @@ const getAllStudents = async (query: Record<string, unknown>) => {
   // Sort query
 
   const sort = query?.sort || '-createdAt';
-  const sortQuery = await filterQuery.sort(sort as string);
+  const sortQuery = filterQuery.sort(sort as string);
 
-  return sortQuery;
+  // Pagination query
+  const page = Number(query?.page) || 1;
+  const limit = Number(query?.limit);
+  const skip = (page - 1) * limit;
+
+  const paginationQuery = await sortQuery.skip(skip).limit(limit);
+
+  return paginationQuery;
 };
 
 const getStudentById = async (id: string) => {
