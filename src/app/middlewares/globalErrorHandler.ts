@@ -1,18 +1,47 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import { ErrorRequestHandler } from 'express';
+import { TErrorSources } from '../interface/error';
+import { ZodError } from 'zod';
+import config from '../config';
+import { handleZodError } from '../errors/handleZodError';
 
-import { NextFunction, Request, Response } from 'express';
-
-export const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
+export const globalErrorHandler: ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  next,
 ) => {
-  res.status(err.statusCode || 500).json({
+  let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
+  let message = err.message || 'something went wrong';
+  let errorSources: TErrorSources = [
+    { path: '', message: 'something went wrong' },
+  ];
+
+  if (err instanceof ZodError) {
+    const simplifiedError = handleZodError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  }
+
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'something went wrong',
+    message,
+    errorSources,
     error: err,
+    stack: config.node_env === 'development' ? err?.stack : null,
   });
+
+  // send error res with this pattern
+  /*  
+      {
+        success,
+        message,
+        errorSources: [{
+            path,
+            message
+        }],
+        stack: only for dev
+      }
+  */
 };
