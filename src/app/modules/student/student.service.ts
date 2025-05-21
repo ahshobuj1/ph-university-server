@@ -5,8 +5,26 @@ import { AppError } from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
 import { TStudent } from './student.interface';
 
-const getAllStudents = async () => {
-  const result = await StudentModel.find()
+const getAllStudents = async (query: Record<string, unknown>) => {
+  const searchTerm = query?.searchTerm || '';
+  console.log(searchTerm);
+
+  const searchableFields: string[] = [
+    'email',
+    'name.firstName',
+    'name.lastName',
+    'contact',
+    'permanentAddress.town',
+    'permanentAddress.village',
+    'localAddress.town',
+    'localAddress.village',
+  ];
+
+  const result = await StudentModel.find({
+    $or: searchableFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  })
     .populate('user')
     .populate('semester')
     .populate({

@@ -7,7 +7,7 @@ import catchAsync from '../../utils/catchAsync';
 // Higher-order func
 
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await studentService.getAllStudents();
+  const result = await studentService.getAllStudents(req?.query);
 
   res.status(200).json({
     success: true,
