@@ -12,7 +12,7 @@ export const handleZodError = (err: ZodError): TCommonErrorResponse => {
 
   return {
     statusCode: httpStatus.BAD_REQUEST,
-    message: 'validation error',
+    message: 'ZodError',
     errorSources,
   };
 };
