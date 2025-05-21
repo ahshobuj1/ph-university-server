@@ -24,28 +24,37 @@ const addressSchema = new Schema({
   town: { type: String, required: true },
 });
 
-const studentSchema = new Schema<TStudent, StaticsStudentModel>({
-  id: { type: String, unique: true },
-  name: { type: nameSchema, required: true },
-  email: { type: String, required: true },
-  user: { type: Schema.Types.ObjectId, unique: true, ref: 'User' },
-  semester: { type: Schema.Types.ObjectId, ref: 'Semester' },
-  department: { type: Schema.Types.ObjectId, ref: 'Department' },
-  age: { type: Number, required: true },
-  contact: { type: String, required: true },
-  fatherName: { type: String, required: true },
-  motherName: { type: String, required: true },
-  fatherContact: { type: String, required: true },
-  matherContact: { type: String, required: true },
-  gender: { type: String, required: true, enum: ['male', 'female', 'others'] },
-  blood: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+const studentSchema = new Schema<TStudent, StaticsStudentModel>(
+  {
+    id: { type: String, unique: true },
+    name: { type: nameSchema, required: true },
+    email: { type: String, required: true },
+    user: { type: Schema.Types.ObjectId, unique: true, ref: 'User' },
+    semester: { type: Schema.Types.ObjectId, ref: 'Semester' },
+    department: { type: Schema.Types.ObjectId, ref: 'Department' },
+    age: { type: Number, required: true },
+    contact: { type: String, required: true },
+    fatherName: { type: String, required: true },
+    motherName: { type: String, required: true },
+    fatherContact: { type: String, required: true },
+    matherContact: { type: String, required: true },
+    gender: {
+      type: String,
+      required: true,
+      enum: ['male', 'female', 'others'],
+    },
+    blood: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    permanentAddress: { type: addressSchema, required: true },
+    localAddress: { type: addressSchema, required: true },
+    isDeleted: { type: Boolean, default: false },
   },
-  permanentAddress: { type: addressSchema, required: true },
-  localAddress: { type: addressSchema, required: true },
-  isDeleted: { type: Boolean, default: false },
-});
+  {
+    timestamps: true,
+  },
+);
 
 // check student exist before delete
 studentSchema.pre('findOneAndUpdate', async function (next) {
