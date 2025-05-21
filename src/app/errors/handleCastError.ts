@@ -1,3 +1,4 @@
+import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { TCommonErrorResponse, TErrorSources } from '../interface/error';
 
@@ -12,7 +13,7 @@ export const handleCastError = (
   ];
 
   return {
-    statusCode: 400,
+    statusCode: httpStatus.BAD_REQUEST,
     message: 'Invalid ID',
     errorSources,
   };
