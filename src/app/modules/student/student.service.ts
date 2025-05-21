@@ -9,6 +9,8 @@ const getAllStudents = async (query: Record<string, unknown>) => {
   const searchTerm = query?.searchTerm || '';
   console.log(searchTerm);
 
+  // Search Query
+
   const searchableFields: string[] = [
     'email',
     'name.firstName',
@@ -20,7 +22,21 @@ const getAllStudents = async (query: Record<string, unknown>) => {
     'localAddress.village',
   ];
 
-  const result = await StudentModel.find({
+  // const result = await StudentModel.find({
+  //   $or: searchableFields.map((field) => ({
+  //     [field]: { $regex: searchTerm, $options: 'i' },
+  //   })),
+  // })
+  //   .populate('user')
+  //   .populate('semester')
+  //   .populate({
+  //     path: 'department',
+  //     populate: {
+  //       path: 'academicFaculty',
+  //     },
+  //   });
+
+  const searchQuery = StudentModel.find({
     $or: searchableFields.map((field) => ({
       [field]: { $regex: searchTerm, $options: 'i' },
     })),
@@ -33,7 +49,18 @@ const getAllStudents = async (query: Record<string, unknown>) => {
         path: 'academicFaculty',
       },
     });
-  return result;
+
+  // Filter query
+
+  const filterQueryObj = { ...query }; //copy
+  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields']; // delete fields from query
+  excludeFields.forEach((field) => delete filterQueryObj[field]);
+
+  console.log(filterQueryObj);
+
+  const filterQuery = await searchQuery.find(filterQueryObj);
+
+  return filterQuery;
 };
 
 const getStudentById = async (id: string) => {
