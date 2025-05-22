@@ -56,6 +56,18 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>(
   },
 );
 
+studentSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  const isExistsID = await StudentModel.findOne({ email: user.email });
+
+  if (isExistsID) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
+
+  next();
+});
+
 // check student exist before delete
 studentSchema.pre('findOneAndUpdate', async function (next) {
   const { id } = this.getQuery();

@@ -36,3 +36,35 @@ export const createStudentId = async (semester: TSemester) => {
 
   return `${semester.year}${semester.code}${incrementId}`;
 };
+
+export const findLastFacultyId = async () => {
+  const lastFaculty = await UserModel.findOne(
+    {
+      role: 'faculty',
+    },
+    {
+      id: 1,
+      _id: 0,
+    },
+  )
+    .sort({
+      createdAt: -1,
+    })
+    .lean();
+
+  return lastFaculty?.id ? lastFaculty.id.substring(2) : undefined;
+};
+
+export const createFacultyId = async () => {
+  let currentId = (0).toString();
+  const lastFacultyId = await findLastFacultyId();
+
+  if (lastFacultyId) {
+    // F- 0001
+    currentId = lastFacultyId.substring(2);
+  }
+
+  const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
+
+  return `F-${incrementId}`;
+};

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
@@ -6,9 +7,10 @@ import { TStudent } from '../student/student.interface';
 import { StudentModel } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
-import { createStudentId } from './user.utils';
+import { createFacultyId, createStudentId } from './user.utils';
 import { AppError } from '../../errors/AppError';
 import { TFaculty } from '../faculty/faculty.interface';
+import { FacultyModel } from '../faculty/faculty.model';
 
 const createStudent = async (password: string, student: TStudent) => {
   // complete the operations using Transaction and Rollback
@@ -46,7 +48,6 @@ const createStudent = async (password: string, student: TStudent) => {
     await session.endSession(); // end session
 
     return newStudent;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     await session.abortTransaction(); // step -> 3
     await session.endSession(); // end session
@@ -55,15 +56,42 @@ const createStudent = async (password: string, student: TStudent) => {
 };
 
 const createFaculty = async (password: string, payload: TFaculty) => {
-  console.log(password, payload);
+  const session = await mongoose.startSession(); // session-> step 1
+
+  try {
+    session.startTransaction(); // session-> step 2
+
+    const generateFacultyID = await createFacultyId();
+
+    const userData: Partial<TUser> = {
+      id: generateFacultyID,
+      password: password || config.default_pass,
+      role: 'faculty',
+    };
+
+    const createUser = await UserModel.create([userData], { session });
+
+    if (!createUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create faculty');
+    }
+
+    payload.id = createUser[0].id;
+    payload.user = createUser[0]._id;
+
+    const createFaculty = await FacultyModel.create([payload], { session });
+
+    await session.commitTransaction(); // session-> step 3
+    await session.endSession();
+
+    return createFaculty; // atLast return faculty
+  } catch (err: any) {
+    await session.abortTransaction(); // session-> step 4
+    await session.endSession();
+    throw new Error(err);
+  }
 };
 
 export const userService = {
   createStudent,
   createFaculty,
 };
-
-// check user exist in the db
-// if (await StudentModel.isUserExists(student.email)) {
-//   throw new Error('User already exists');
-// }

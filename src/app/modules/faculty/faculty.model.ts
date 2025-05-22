@@ -1,6 +1,8 @@
+import httpStatus from 'http-status';
 import { model, Schema } from 'mongoose';
 import { TFaculty, TFacultyName } from './faculty.interface';
 import { Blood, Gender } from './faculty.constant';
+import { AppError } from '../../errors/AppError';
 
 const facultyNameSchema = new Schema<TFacultyName>({
   firstName: { type: String, required: true },
@@ -10,19 +12,11 @@ const facultyNameSchema = new Schema<TFacultyName>({
 
 const facultySchema = new Schema<TFaculty>(
   {
-    id: { type: String, required: true },
+    id: { type: String, required: true, unique: true },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
+    email: { type: String, required: true },
     designation: { type: String, required: true },
     name: facultyNameSchema,
-    gender: { type: String, required: true, enum: Gender },
-    dateOfBirth: { type: String, required: true },
-    email: { type: String, required: true },
-    contact: { type: String, required: true },
-    emergencyContact: { type: String, required: true },
-    localAddress: { type: String, required: true },
-    permanentAddress: { type: String, required: true },
-    profileImage: { type: String, required: true },
-    blood: { type: String, enum: Blood },
     academicFaculty: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicFaculty',
@@ -33,6 +27,14 @@ const facultySchema = new Schema<TFaculty>(
       ref: 'Department',
       required: true,
     },
+    gender: { type: String, required: true, enum: Gender },
+    dateOfBirth: { type: String, required: true },
+    contact: { type: String, required: true },
+    emergencyContact: { type: String, required: true },
+    localAddress: { type: String, required: true },
+    permanentAddress: { type: String, required: true },
+    profileImage: { type: String, required: true },
+    blood: { type: String, enum: Blood },
     isDeleted: { type: Boolean, default: false },
   },
   {
@@ -40,22 +42,16 @@ const facultySchema = new Schema<TFaculty>(
   },
 );
 
-export const FacultyModel = model<TFaculty>('Faculty', facultySchema);
+facultySchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  const isExistsID = await FacultyModel.findOne({ email: user.email });
 
-// _id
-// id (Generated)
-// user
-// name
-// email
-// academicFaculty
-// department
-// gender
-// dateOfBirth
-// designation
-// blood
-// contact
-// emergencyContact
-// localAddress
-// permanentAddress
-// profileImage
-// isDeleted
+  if (isExistsID) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
+
+  next();
+});
+
+export const FacultyModel = model<TFaculty>('Faculty', facultySchema);

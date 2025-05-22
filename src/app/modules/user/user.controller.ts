@@ -21,6 +21,7 @@ const createFaculty = catchAsync(async (req, res) => {
     result: result,
   });
 });
+
 export const userController = {
   createStudent,
   createFaculty,
