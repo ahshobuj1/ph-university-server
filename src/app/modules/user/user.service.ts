@@ -8,6 +8,7 @@ import { TUser } from './user.interface';
 import { UserModel } from './user.model';
 import { createStudentId } from './user.utils';
 import { AppError } from '../../errors/AppError';
+import { TFaculty } from '../faculty/faculty.interface';
 
 const createStudent = async (password: string, student: TStudent) => {
   // complete the operations using Transaction and Rollback
@@ -53,8 +54,13 @@ const createStudent = async (password: string, student: TStudent) => {
   }
 };
 
+const createFaculty = async (password: string, payload: TFaculty) => {
+  console.log(password, payload);
+};
+
 export const userService = {
   createStudent,
+  createFaculty,
 };
 
 // check user exist in the db

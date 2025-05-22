@@ -4,18 +4,24 @@ import catchAsync from '../../utils/catchAsync';
 
 const createStudent = catchAsync(async (req, res) => {
   const { password, student } = req.body;
-
-  // Zod validation
-  // const validateStudent = studentValidationWithZod.parse(student);
-
-  //send to service
   const result = await userService.createStudent(password, student);
 
   sendResponse(res, {
-    message: 'Student created successfully',
+    message: 'Student is created successfully',
+    result: result,
+  });
+});
+
+const createFaculty = catchAsync(async (req, res) => {
+  const { password, faculty } = req.body;
+  const result = await userService.createFaculty(password, faculty);
+
+  sendResponse(res, {
+    message: 'Faculty is created successfully',
     result: result,
   });
 });
 export const userController = {
   createStudent,
+  createFaculty,
 };
