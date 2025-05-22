@@ -3,7 +3,7 @@ import sendResponse from '../../utils/sendResponse';
 import { facultyService } from './faculty.service';
 
 const getAllFaculty = catchAsync(async (req, res) => {
-  const result = await facultyService.getAllFaculty();
+  const result = await facultyService.getAllFaculty(req?.query);
 
   sendResponse(res, {
     message: 'Faculty is retrieved successfully',
@@ -21,7 +21,20 @@ const getSingleFaculty = catchAsync(async (req, res) => {
   });
 });
 
+const updateFaculty = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { faculty } = req.body;
+
+  const result = await facultyService.updateFaculty(id, faculty);
+
+  sendResponse(res, {
+    message: 'Faculty is updated successfully',
+    result,
+  });
+});
+
 export const facultyController = {
   getAllFaculty,
   getSingleFaculty,
+  updateFaculty,
 };

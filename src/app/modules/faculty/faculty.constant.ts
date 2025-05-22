@@ -11,3 +11,15 @@ export const Blood: TBlood[] = [
   'O+',
   'O-',
 ];
+
+export const searchableFields: string[] = [
+  'id',
+  'email',
+  'name.firstName',
+  'name.lastName',
+  'contact',
+  'localAddress',
+  'permanentAddress',
+  'designation',
+  'gender',
+];

@@ -52,7 +52,7 @@ export const findLastFacultyId = async () => {
     })
     .lean();
 
-  return lastFaculty?.id ? lastFaculty.id.substring(2) : undefined;
+  return lastFaculty?.id ? lastFaculty.id : undefined;
 };
 
 export const createFacultyId = async () => {
