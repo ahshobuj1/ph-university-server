@@ -70,19 +70,3 @@ export const adminValidations = {
   createAdminValidation,
   updateAdminValidation,
 };
-
-// _id
-// id (Generated)
-// user
-// designation
-// name
-// gender
-// dateOfBirth
-// email
-// contact
-// emergencyContact
-// localAddress
-// permanentAddress
-// profileImage
-// blood
-// isDeleted
