@@ -9,7 +9,10 @@ import mongoose from 'mongoose';
 
 const getAllFaculty = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
-    FacultyModel.find().populate('academicFaculty').populate('department'),
+    FacultyModel.find()
+      .populate('user')
+      .populate('academicFaculty')
+      .populate('department'),
     query,
   )
     .search(searchableFields)
@@ -24,6 +27,7 @@ const getAllFaculty = async (query: Record<string, unknown>) => {
 
 const getSingleFaculty = async (id: string) => {
   const result = await FacultyModel.findById(id)
+    .populate('user')
     .populate('academicFaculty')
     .populate('department');
 
