@@ -37,7 +37,7 @@ export const createStudentId = async (semester: TSemester) => {
   return `${semester.year}${semester.code}${incrementId}`;
 };
 
-export const findLastFacultyId = async () => {
+const findLastFacultyId = async () => {
   const lastFaculty = await UserModel.findOne(
     {
       role: 'faculty',
@@ -67,4 +67,29 @@ export const createFacultyId = async () => {
   const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
 
   return `F-${incrementId}`;
+};
+
+// Admin ID
+const findLastAdminId = async () => {
+  const lastAdminID = await UserModel.findOne(
+    { role: 'admin' },
+    { id: 1, _id: 0 },
+  )
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return lastAdminID?.id ? lastAdminID?.id : undefined;
+};
+
+export const createAdminId = async () => {
+  let currentId = (0).toString();
+  const lastAdminId = await findLastAdminId();
+
+  if (lastAdminId) {
+    currentId = lastAdminId.substring(2);
+  }
+
+  const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
+
+  return `A-${incrementId}`;
 };

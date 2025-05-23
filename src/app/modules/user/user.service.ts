@@ -7,10 +7,12 @@ import { TStudent } from '../student/student.interface';
 import { StudentModel } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
-import { createFacultyId, createStudentId } from './user.utils';
+import { createAdminId, createFacultyId, createStudentId } from './user.utils';
 import { AppError } from '../../errors/AppError';
 import { TFaculty } from '../faculty/faculty.interface';
 import { FacultyModel } from '../faculty/faculty.model';
+import { TAdmin } from '../Admin/admin.interface';
+import { AdminModel } from '../Admin/admin.model';
 
 const createStudent = async (password: string, student: TStudent) => {
   // complete the operations using Transaction and Rollback
@@ -41,7 +43,7 @@ const createStudent = async (password: string, student: TStudent) => {
 
     const newStudent = await StudentModel.create([student], { session });
     if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'failed to create student');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
     }
 
     await session.commitTransaction(); // step -> 2
@@ -61,10 +63,10 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   try {
     session.startTransaction(); // session-> step 2
 
-    const generateFacultyID = await createFacultyId();
+    const generatedFacultyID = await createFacultyId();
 
     const userData: Partial<TUser> = {
-      id: generateFacultyID,
+      id: generatedFacultyID,
       password: password || config.default_pass,
       role: 'faculty',
     };
@@ -91,7 +93,48 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   }
 };
 
+const createAdmin = async (password: string, payload: TAdmin) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const generatedAdminId = await createAdminId();
+
+    const userData: Partial<TUser> = {
+      id: generatedAdminId,
+      password: password || config.default_pass,
+      role: 'admin',
+    };
+
+    const createUser = await UserModel.create([userData], { session });
+
+    if (!createUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
+    }
+
+    payload.id = createUser[0].id;
+    payload.user = createUser[0]._id;
+
+    const createAdmin = await AdminModel.create([payload], { session });
+
+    if (!createAdmin) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return createAdmin;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+
 export const userService = {
   createStudent,
   createFaculty,
+  createAdmin,
 };

@@ -47,7 +47,7 @@ const updateAdminNameValidation = z
 
 const updateAdminValidation = z
   .object({
-    faculty: z
+    admin: z
       .object({
         designation: z.string().optional(),
         name: updateAdminNameValidation.optional(),
@@ -60,8 +60,6 @@ const updateAdminValidation = z
         permanentAddress: z.string().optional(),
         profileImage: z.string().optional(),
         blood: z.enum([...Blood] as [string, ...string[]]).optional(),
-        academicFaculty: z.string().optional(),
-        department: z.string().optional(),
         isDeleted: z.boolean().optional(),
       })
       .partial(),
