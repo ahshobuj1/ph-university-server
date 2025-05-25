@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { AppError } from '../../errors/AppError';
 import { courseSearchableFields } from './course.constant';
 import { TCourse } from './course.interface';
 import { CourseModel } from './course.model';
+import mongoose from 'mongoose';
 
 const createCourse = async (payload: Partial<TCourse>) => {
   const result = await CourseModel.create(payload);
@@ -31,11 +35,75 @@ const getSingleCourse = async (id: string) => {
 };
 
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
-  const result = await CourseModel.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
+  const session = await mongoose.startSession();
+  const { preRequisiteCourses, ...remainingCourseData } = payload;
 
-  return result;
+  try {
+    session.startTransaction();
+
+    const basicCourseUpdateInfo = await CourseModel.findByIdAndUpdate(
+      id,
+      remainingCourseData,
+      {
+        new: true,
+        session,
+      },
+    );
+
+    if (!basicCourseUpdateInfo) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+    }
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      const PreRequisiteToDelete = preRequisiteCourses
+        .filter((item) => item.course && item.isDeleted)
+        .map((item) => item.course);
+
+      // Delete course to array
+      const deletedPreRequisiteCourses = await CourseModel.findByIdAndUpdate(
+        id,
+        {
+          $pull: {
+            preRequisiteCourses: { course: { $in: PreRequisiteToDelete } },
+          },
+        },
+        { new: true, session },
+      );
+
+      if (!deletedPreRequisiteCourses) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+
+      // Add new course to array
+      const preRequisiteToAdd = preRequisiteCourses.filter(
+        (item) => item.course && !item.isDeleted,
+      );
+
+      const addedNewPreRequisite = await CourseModel.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            preRequisiteCourses: { $each: preRequisiteToAdd },
+          },
+        },
+        { new: true, session },
+      );
+
+      if (!addedNewPreRequisite) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    const result = await CourseModel.findById(id);
+    return result;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
 };
 
 const deleteCourse = async (id: string) => {
