@@ -28,4 +28,10 @@ router.put(
   courseController.updateFacultiesWithCourse,
 );
 
+router.patch(
+  '/:courseId/remove-course',
+  validationChecker(courseValidations.FacultyWithCourseValidation),
+  courseController.removeFacultiesWithCourse,
+);
+
 export const courseRoutes = router;
