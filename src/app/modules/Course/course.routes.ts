@@ -22,4 +22,10 @@ router.patch(
 
 router.delete('/:id', courseController.deleteCourse);
 
+router.put(
+  '/:courseId/assign-course',
+  validationChecker(courseValidations.FacultyWithCourseValidation),
+  courseController.updateFacultiesWithCourse,
+);
+
 export const courseRoutes = router;
