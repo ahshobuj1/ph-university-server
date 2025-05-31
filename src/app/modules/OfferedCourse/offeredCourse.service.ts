@@ -74,7 +74,7 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
   }
 
   // check is section already exists with same Semester Registration
-  const isSectionAlreadyExists = await OfferedCourseModel.find({
+  const isSectionAlreadyExists = await OfferedCourseModel.findOne({
     semesterRegistration,
     course,
     section,
@@ -86,6 +86,37 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
       'Offered course with same section already exists',
     );
   }
+
+  // get schedule of the faculties
+  const assignSchedules = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('section days startTime endTime');
+
+  console.log(assignSchedules);
+
+  const newSchedules = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  assignSchedules.forEach((schedule) => {
+    const existingStartTime = `1970-01-01T${schedule.startTime}`;
+    const existingEndTime = `1970-01-01T${schedule.endTime}`;
+    const newStartTime = `1970-01-01T${newSchedules.startTime}`;
+    const newEndTime = `1970-01-01T${schedule.endTime}`;
+
+    // 07:00 - 09:00
+    // 10:00 - 12:00
+    if (newStartTime < existingEndTime && newEndTime > existingStartTime) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        'The faculty is not available at that time! please chose another time or days.',
+      );
+    }
+  });
 
   const result = await OfferedCourseModel.create(payload);
   return result;
