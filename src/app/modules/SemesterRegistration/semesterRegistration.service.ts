@@ -37,7 +37,7 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
   }
 
   // Check if the semester is already registered!
-  const isSemesterAlreadyExists = await SemesterModel.find({
+  const isSemesterAlreadyExists = await SemesterRegistrationModel.findOne({
     semester: payload.semester,
   });
   if (isSemesterAlreadyExists) {
