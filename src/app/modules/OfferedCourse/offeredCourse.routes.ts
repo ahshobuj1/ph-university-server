@@ -13,6 +13,10 @@ router.post(
 
 // router.get('/');
 // router.post('/:id');
-// router.patch('/:id');
+router.patch(
+  '/:id',
+  validationChecker(offeredCourseValidations.updateOfferedCourseValidation),
+  offeredCourseController.updateOfferedCourse,
+);
 
 export const offeredCourseRoutes = router;

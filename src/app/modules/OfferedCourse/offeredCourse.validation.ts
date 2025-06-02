@@ -37,6 +37,27 @@ const createOfferedCourseValidation = z
     },
   );
 
+const updateOfferedCourseValidation = z
+  .object({
+    faculty: z.string(),
+    maxCapacity: z.number(),
+    days: z.array(z.enum([...Days] as [string, ...string[]])),
+    startTime: timeStringValidation,
+    endTime: timeStringValidation,
+  })
+  .refine(
+    (data) => {
+      const start = `1971-01-01T${data.startTime}`;
+      const end = `1971-01-01T${data.endTime}`;
+
+      return end > start;
+    },
+    {
+      message: 'End time must be after Start time',
+    },
+  );
+
 export const offeredCourseValidations = {
   createOfferedCourseValidation,
+  updateOfferedCourseValidation,
 };
