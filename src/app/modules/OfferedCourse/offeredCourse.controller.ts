@@ -8,8 +8,25 @@ const createOfferedCourse = catchAsync(async (req, res) => {
   sendResponse(res, { message: 'Offered course created successfully', result });
 });
 
-const getAllOfferedCourse = catchAsync(async () => {});
-const getSingleOfferedCourse = catchAsync(async () => {});
+const getAllOfferedCourse = catchAsync(async (req, res) => {
+  const result = await offeredCourseService.getAllOfferedCourse(req?.query);
+
+  sendResponse(res, {
+    message: 'Offered course is retrieved successfully',
+    result,
+  });
+});
+
+const getSingleOfferedCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await offeredCourseService.getSingleOfferedCourse(id);
+
+  sendResponse(res, {
+    message: 'Offered course is retrieved successfully',
+    result,
+  });
+});
+
 const updateOfferedCourse = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await offeredCourseService.updateOfferedCourse(id, req.body);
@@ -20,9 +37,20 @@ const updateOfferedCourse = catchAsync(async (req, res) => {
   });
 });
 
+const deleteOfferedCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await offeredCourseService.deleteOfferedCourse(id);
+
+  sendResponse(res, {
+    message: 'Offered course is deleted successfully',
+    result,
+  });
+});
+
 export const offeredCourseController = {
   createOfferedCourse,
   getAllOfferedCourse,
   getSingleOfferedCourse,
   updateOfferedCourse,
+  deleteOfferedCourse,
 };
