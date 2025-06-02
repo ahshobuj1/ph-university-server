@@ -5,6 +5,6 @@ export type TSemesterRegistration = {
   status: 'UPCOMING' | 'ONGOING' | 'ENDED';
   startDate: Date;
   endDate: Date;
-  minCredit: number;
-  maxCredit: number;
+  minCredit?: number;
+  maxCredit?: number;
 };
