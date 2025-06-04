@@ -6,7 +6,7 @@ import config from '../../config';
 const userSchema = new Schema<TUser>(
   {
     id: { type: String },
-    password: { type: String },
+    password: { type: String, select: 0 },
     needsPasswordChange: { type: Boolean, default: true },
     role: { type: String, enum: ['student', 'faculty', 'admin'] },
     status: {
@@ -15,6 +15,7 @@ const userSchema = new Schema<TUser>(
       default: 'in-progress',
     },
     isDeleted: { type: Boolean, default: false },
+    passwordUpdatedAt: { type: Date },
   },
   {
     timestamps: true,

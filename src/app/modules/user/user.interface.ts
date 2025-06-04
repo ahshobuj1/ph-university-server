@@ -7,6 +7,7 @@ export type TUser = {
   role?: 'student' | 'faculty' | 'admin';
   status?: 'in-progress' | 'blocked';
   isDeleted?: boolean;
+  passwordUpdatedAt?: Date;
 };
 
 export type TUserRole = keyof typeof UserRole;

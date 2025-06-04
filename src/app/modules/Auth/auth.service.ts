@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
-import { TLoginUser } from './auth.interface';
+import { TChangePassword, TLoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 
 const loginUser = async (payload: TLoginUser) => {
@@ -49,13 +49,9 @@ const loginUser = async (payload: TLoginUser) => {
     role: existingUser?.role,
   };
 
-  const accessToken = jwt.sign(
-    { jwtPayload },
-    config.jwt_access_secret as string,
-    {
-      expiresIn: '10d',
-    },
-  );
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: '10d',
+  });
 
   return {
     accessToken,
@@ -63,6 +59,56 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+const changePassword = async (
+  userData: JwtPayload,
+  payload: TChangePassword,
+) => {
+  // console.log('auth service -> ', payload, userData);
+
+  // check user exists and get user data
+  const isExistsUser = await UserModel.findOne({
+    id: userData.id,
+    role: userData.role,
+  }).select('+password');
+
+  if (!isExistsUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // check old password is correct
+  const isPasswordMatched = await bcrypt.compare(
+    payload.oldPassword,
+    isExistsUser.password as string,
+  );
+
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Incorrect old password!');
+  }
+
+  // hash new password
+  const hashNewPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  // now change password
+  const changedPassword = await UserModel.findOneAndUpdate(
+    {
+      id: userData.id,
+      role: userData.role,
+    },
+    {
+      password: hashNewPassword,
+      needsPasswordChange: false,
+      passwordUpdatedAt: new Date(),
+    },
+    { new: true },
+  );
+
+  return changedPassword;
+};
+
 export const authService = {
   loginUser,
+  changePassword,
 };

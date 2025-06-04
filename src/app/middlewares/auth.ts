@@ -24,19 +24,15 @@ const auth = (...requiredRoles: TUserRole[]) => {
     ) as JwtPayload;
 
     // decoded user role and id
-    const {
-      jwtPayload: { role },
-    } = decoded;
+    const { role } = decoded;
 
     // check authorization access by role
     if (requiredRoles && !requiredRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // console.log(decoded, 'from auth -> ', req.headers.authorization);
-
     // set user to express req
-    req.user = decoded;
+    req.user = decoded as JwtPayload;
     next();
   });
 };
