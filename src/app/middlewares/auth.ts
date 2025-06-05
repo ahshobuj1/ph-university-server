@@ -28,19 +28,19 @@ const auth = (...requiredRoles: TUserRole[]) => {
     const { role, id, iat } = decoded;
 
     // check is user exists
-    const existingUser = await UserModel.findOne({ id });
+    const user = await UserModel.findOne({ id });
 
-    if (!existingUser) {
+    if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
     // check user status
-    if (existingUser?.status === 'blocked') {
+    if (user?.status === 'blocked') {
       throw new AppError(httpStatus.FORBIDDEN, 'The user is blocked');
     }
 
     // check user isDeleted
-    if (existingUser?.isDeleted) {
+    if (user?.isDeleted) {
       throw new AppError(httpStatus.FORBIDDEN, 'The user is deleted');
     }
 
@@ -49,12 +49,11 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // check if password changed after creating jwt token
-    // Token is no longer valid due to password change
+    // check if password changed after creating jwt token : Token is no longer valid due to password change
 
-    if (existingUser?.passwordUpdatedAt) {
+    if (user?.passwordUpdatedAt) {
       const passwordUpdatedAtInSeconds = Math.floor(
-        new Date(existingUser?.passwordUpdatedAt).getTime() / 1000,
+        new Date(user?.passwordUpdatedAt).getTime() / 1000,
       );
 
       if (passwordUpdatedAtInSeconds > (iat as number)) {
