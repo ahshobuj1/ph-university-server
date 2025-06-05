@@ -14,7 +14,9 @@ const loginUser = async (payload: TLoginUser) => {
   // 5-> create jwt token and sent to client
 
   // check if user exists
-  const existingUser = await UserModel.findOne({ id: payload.id });
+  const existingUser = await UserModel.findOne({ id: payload.id }).select(
+    '+password',
+  );
 
   if (!existingUser) {
     throw new AppError(

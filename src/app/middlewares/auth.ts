@@ -5,6 +5,7 @@ import { AppError } from '../errors/AppError';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
+import { UserModel } from '../modules/user/user.model';
 
 // higher-order middleware func
 const auth = (...requiredRoles: TUserRole[]) => {
@@ -24,11 +25,44 @@ const auth = (...requiredRoles: TUserRole[]) => {
     ) as JwtPayload;
 
     // decoded user role and id
-    const { role } = decoded;
+    const { role, id, iat } = decoded;
+
+    // check is user exists
+    const existingUser = await UserModel.findOne({ id });
+
+    if (!existingUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    // check user status
+    if (existingUser?.status === 'blocked') {
+      throw new AppError(httpStatus.FORBIDDEN, 'The user is blocked');
+    }
+
+    // check user isDeleted
+    if (existingUser?.isDeleted) {
+      throw new AppError(httpStatus.FORBIDDEN, 'The user is deleted');
+    }
 
     // check authorization access by role
     if (requiredRoles && !requiredRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+    }
+
+    // check if password changed after creating jwt token
+    // Token is no longer valid due to password change
+
+    if (existingUser?.passwordUpdatedAt) {
+      const passwordUpdatedAtInSeconds = Math.floor(
+        new Date(existingUser?.passwordUpdatedAt).getTime() / 1000,
+      );
+
+      if (passwordUpdatedAtInSeconds > (iat as number)) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          'Token is no longer valid due to password change',
+        );
+      }
     }
 
     // set user to express req

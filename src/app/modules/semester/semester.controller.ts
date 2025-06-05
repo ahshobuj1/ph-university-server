@@ -10,6 +10,7 @@ const createSemester = catchAsync(async (req, res) => {
 });
 
 const getAllSemester = catchAsync(async (req, res) => {
+  console.log(req.user);
   const result = await semesterService.getAllSemester();
 
   sendResponse(res, { message: 'Semester got successfully', result });

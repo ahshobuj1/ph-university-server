@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { semesterController } from './semester.controller';
 import validationChecker from '../../middlewares/validationChecker';
 import { semesterValidations } from './semester.validation';
+import auth from '../../middlewares/auth';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.post(
   semesterController.createSemester,
 );
 
-router.get('/', semesterController.getAllSemester);
+router.get('/', auth('student'), semesterController.getAllSemester);
 router.get('/:id', semesterController.getSemesterById);
 
 router.patch(
