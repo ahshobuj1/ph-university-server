@@ -27,6 +27,7 @@ const createStudent = async (password: string, student: TStudent) => {
 
     const userData: Partial<TUser> = {
       id: generatedStudentId,
+      email: student.email,
       password: password || config.default_pass,
       role: 'student',
     };
@@ -67,6 +68,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
 
     const userData: Partial<TUser> = {
       id: generatedFacultyID,
+      email: payload.email,
       password: password || config.default_pass,
       role: 'faculty',
     };
@@ -103,6 +105,7 @@ const createAdmin = async (password: string, payload: TAdmin) => {
 
     const userData: Partial<TUser> = {
       id: generatedAdminId,
+      email: payload.email,
       password: password || config.default_pass,
       role: 'admin',
     };

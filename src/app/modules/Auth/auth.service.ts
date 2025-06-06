@@ -5,6 +5,7 @@ import { TChangePassword, TLoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
+import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
   // 1-> check exists user
@@ -171,8 +172,46 @@ const refreshToken = async (token: string) => {
   return { accessToken };
 };
 
+const forgotPassword = async (id: string) => {
+  console.log(id);
+
+  // check is user exists
+  const user = await UserModel.findOne({ id });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // check user status
+  if (user?.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'The user is blocked');
+  }
+
+  // check user isDeleted
+  if (user?.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'The user is deleted');
+  }
+
+  // create jwt token
+  const jwtPayload = {
+    id: user?.id,
+    role: user?.role,
+  };
+
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: '10d',
+  });
+
+  const resetPasswordUiLink = `${config.reset_pass_ui_link}?id=${id}&token=${accessToken}`;
+
+  await sendEmail(user?.email, resetPasswordUiLink, 'Reset your password!');
+
+  return resetPasswordUiLink;
+};
+
 export const authService = {
   loginUser,
   changePassword,
   refreshToken,
+  forgotPassword,
 };
