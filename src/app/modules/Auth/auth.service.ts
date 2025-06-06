@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
-import { TChangePassword, TLoginUser } from './auth.interface';
+import { TChangePassword, TLoginUser, TResetPassword } from './auth.interface';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
@@ -74,19 +74,19 @@ const changePassword = async (
   // console.log('auth service -> ', payload, userData);
 
   // check user exists and get user data
-  const isExistsUser = await UserModel.findOne({
+  const user = await UserModel.findOne({
     id: userData.id,
     role: userData.role,
   }).select('+password');
 
-  if (!isExistsUser) {
+  if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   // check old password is correct
   const isPasswordMatched = await bcrypt.compare(
     payload.oldPassword,
-    isExistsUser.password as string,
+    user.password as string,
   );
 
   if (!isPasswordMatched) {
@@ -173,8 +173,6 @@ const refreshToken = async (token: string) => {
 };
 
 const forgotPassword = async (id: string) => {
-  console.log(id);
-
   // check is user exists
   const user = await UserModel.findOne({ id });
 
@@ -199,14 +197,68 @@ const forgotPassword = async (id: string) => {
   };
 
   const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: '10d',
+    expiresIn: '10m',
   });
 
   const resetPasswordUiLink = `${config.reset_pass_ui_link}?id=${id}&token=${accessToken}`;
 
+  // send the link to the user email
   await sendEmail(user?.email, resetPasswordUiLink, 'Reset your password!');
+};
 
-  return resetPasswordUiLink;
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  // verify token
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  if (decoded.id !== payload.id) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'you are not authorized! Invalid ID',
+    );
+  }
+
+  // check is user exists
+  const user = await UserModel.findOne({ id: decoded.id });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // check user status
+  if (user?.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'The user is blocked!');
+  }
+
+  // check user isDeleted
+  if (user?.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'The user is deleted!');
+  }
+
+  // check if newPassword and confirm new password is matched
+  if (payload.newPassword !== payload.confirmNewPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'New password and confirm password do not match!',
+    );
+  }
+
+  const hashNewPassword = await bcrypt.hash(
+    payload.confirmNewPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  // finally update hash password
+  await UserModel.findOneAndUpdate(
+    { id: user.id },
+    {
+      password: hashNewPassword,
+      passwordUpdatedAt: new Date(),
+      needsPasswordChange: false,
+    },
+  );
 };
 
 export const authService = {
@@ -214,4 +266,5 @@ export const authService = {
   changePassword,
   refreshToken,
   forgotPassword,
+  resetPassword,
 };

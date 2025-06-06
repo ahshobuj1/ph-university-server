@@ -1,4 +1,6 @@
+import httpStatus from 'http-status';
 import config from '../../config';
+import { AppError } from '../../errors/AppError';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { authService } from './auth.service';
@@ -50,9 +52,25 @@ const forgotPassword = catchAsync(async (req, res) => {
   });
 });
 
+const resetPassword = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new AppError(httpStatus.FORBIDDEN, 'you are not authorized!');
+  }
+
+  const result = await authService.resetPassword(req.body, token as string);
+
+  sendResponse(res, {
+    message: 'reset password successfully! ',
+    result,
+  });
+});
+
 export const authController = {
   loginUser,
   changePassword,
   refreshToken,
   forgotPassword,
+  resetPassword,
 };
