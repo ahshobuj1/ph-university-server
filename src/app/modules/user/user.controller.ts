@@ -3,8 +3,10 @@ import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
 
 const createStudent = catchAsync(async (req, res) => {
+  // console.log(req.file);
+
   const { password, student } = req.body;
-  const result = await userService.createStudent(password, student);
+  const result = await userService.createStudent(req.file, password, student);
 
   sendResponse(res, {
     message: 'Student is created successfully',

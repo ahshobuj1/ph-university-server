@@ -29,6 +29,7 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>(
     id: { type: String, unique: true },
     name: { type: nameSchema, required: true },
     email: { type: String, required: true },
+    profileImg: { type: String },
     user: { type: Schema.Types.ObjectId, unique: true, ref: 'User' },
     semester: { type: Schema.Types.ObjectId, ref: 'Semester' },
     department: { type: Schema.Types.ObjectId, ref: 'Department' },

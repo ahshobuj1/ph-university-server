@@ -6,12 +6,16 @@ import { facultyValidations } from '../faculty/faculty.validation';
 import { adminValidations } from '../Admin/admin.validation';
 import auth from '../../middlewares/auth';
 import { UserRole } from './user.constant';
+import { upload } from '../../utils/uploadImageToCloudinary';
+import { formDataToJSON } from '../../utils/formDataToJSON';
 
 const router = Router();
 
 router.post(
   '/create-student',
   auth(UserRole.admin),
+  upload.single('file'),
+  formDataToJSON,
   validationChecker(studentValidations.createStudentValidationsSchema),
   userController.createStudent,
 );

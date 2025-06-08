@@ -15,8 +15,13 @@ import { TAdmin } from '../Admin/admin.interface';
 import { AdminModel } from '../Admin/admin.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { UserRole } from './user.constant';
+import { uploadImageToCloudinary } from '../../utils/uploadImageToCloudinary';
 
-const createStudent = async (password: string, student: TStudent) => {
+const createStudent = async (
+  file: any,
+  password: string,
+  student: TStudent,
+) => {
   // complete the operations using Transaction and Rollback
 
   const getSemester = await SemesterModel.findById(student.semester);
@@ -26,6 +31,10 @@ const createStudent = async (password: string, student: TStudent) => {
     session.startTransaction(); // step -> 1
     // student id
     const generatedStudentId = await createStudentId(getSemester!);
+
+    // upload image to cloudinary
+    const imageName = `${student?.name?.firstName}-${generatedStudentId}`;
+    const { secure_url } = await uploadImageToCloudinary(file.path, imageName);
 
     const userData: Partial<TUser> = {
       id: generatedStudentId,
@@ -43,6 +52,7 @@ const createStudent = async (password: string, student: TStudent) => {
 
     student.id = createUser[0].id;
     student.user = createUser[0]._id;
+    student.profileImg = secure_url;
 
     const newStudent = await StudentModel.create([student], { session });
     if (!newStudent.length) {
