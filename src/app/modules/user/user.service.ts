@@ -13,6 +13,8 @@ import { TFaculty } from '../faculty/faculty.interface';
 import { FacultyModel } from '../faculty/faculty.model';
 import { TAdmin } from '../Admin/admin.interface';
 import { AdminModel } from '../Admin/admin.model';
+import { JwtPayload } from 'jsonwebtoken';
+import { UserRole } from './user.constant';
 
 const createStudent = async (password: string, student: TStudent) => {
   // complete the operations using Transaction and Rollback
@@ -136,8 +138,23 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (token: JwtPayload) => {
+  const { id, role } = token;
+
+  if (role === UserRole.student) {
+    return await UserModel.findOne({ id, role });
+  }
+  if (role === UserRole.faculty) {
+    return await UserModel.findOne({ id, role });
+  }
+  if (role === UserRole.admin) {
+    return await UserModel.findOne({ id, role });
+  }
+};
+
 export const userService = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
 };

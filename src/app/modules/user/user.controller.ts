@@ -32,8 +32,19 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const getMe = catchAsync(async (req, res) => {
+  const token = req.user;
+  const result = await userService.getMe(token);
+
+  sendResponse(res, {
+    message: 'User is retrieved successfully',
+    result: result,
+  });
+});
+
 export const userController = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
 };
