@@ -11,6 +11,7 @@ import { SemesterRegistrationModel } from '../SemesterRegistration/semesterRegis
 import { CourseModel } from '../Course/course.model';
 import { FacultyModel } from '../faculty/faculty.model';
 import { calculateGradeAndGPA } from './enrolledCourse.utils';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createEnrolledCourse = async (
   token: JwtPayload,
@@ -163,6 +164,53 @@ const createEnrolledCourse = async (
   }
 };
 
+const getAllEnrolledCourse = async (query: Record<string, unknown>) => {
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCurseModel.find().populate(
+      'semesterRegistration semester academicFaculty department offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+  return { meta, result };
+};
+
+const getMyEnrolledCourse = async (
+  token: JwtPayload,
+  query: Record<string, unknown>,
+) => {
+  const studentId = token.id;
+
+  const student = await StudentModel.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCurseModel.find({
+      student: student._id,
+    }).populate(
+      'semesterRegistration semester academicFaculty department offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+  return { meta, result };
+};
+
 const updateEnrolledCourseMarks = async (
   token: JwtPayload,
   payload: Partial<TEnrolledCourse>,
@@ -211,6 +259,7 @@ const updateEnrolledCourseMarks = async (
     modifiedCourseMarksData.grade = grade;
     modifiedCourseMarksData.gradePoints = gradePoints;
     modifiedCourseMarksData.isCompleted = true;
+    modifiedCourseMarksData.updatedAt = Date.now();
   }
 
   if (courseMarks && Object.keys(courseMarks).length) {
@@ -233,4 +282,6 @@ const updateEnrolledCourseMarks = async (
 export const enrolledCourseService = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
+  getAllEnrolledCourse,
+  getMyEnrolledCourse,
 };

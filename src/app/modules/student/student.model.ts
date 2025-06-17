@@ -98,6 +98,6 @@ studentSchema.statics.isUserExists = async function (email: string) {
 };
 
 export const StudentModel = model<TStudent, StaticsStudentModel>(
-  'student',
+  'Student',
   studentSchema,
 );

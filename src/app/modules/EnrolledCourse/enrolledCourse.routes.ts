@@ -13,6 +13,18 @@ router.post(
   enrolledCourseController.createEnrolledCourse,
 );
 
+router.get(
+  '/',
+  auth('admin', 'faculty'),
+  enrolledCourseController.getAllEnrolledCourse,
+);
+
+router.get(
+  '/my-enrolled-course',
+  auth('student'),
+  enrolledCourseController.getMyEnrolledCourse,
+);
+
 router.patch(
   '/update-enrolled-course',
   auth('faculty', 'admin'),
