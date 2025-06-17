@@ -7,6 +7,8 @@ import { AppError } from '../../errors/AppError';
 import { StudentModel } from '../student/student.model';
 import { EnrolledCurseModel } from './enrolledCourse.model';
 import mongoose from 'mongoose';
+import { SemesterRegistrationModel } from '../SemesterRegistration/semesterRegistration.model';
+import { CourseModel } from '../Course/course.model';
 
 const createEnrolledCourse = async (
   token: JwtPayload,
@@ -25,7 +27,7 @@ const createEnrolledCourse = async (
   //* step-1
   const isOfferedCourseExits = await OfferedCourseModel.findById(
     payload.offeredCourse,
-  );
+  ).populate('course');
 
   if (!isOfferedCourseExits) {
     throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found!');
@@ -45,20 +47,86 @@ const createEnrolledCourse = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Student not found!');
   }
 
-  const studentAlreadyExists = await EnrolledCurseModel.findOne({
-    offeredCourse: payload?.offeredCourse,
-    semesterRegistration: isOfferedCourseExits?.semesterRegistration,
-    student: student?._id,
-  });
+  // const studentAlreadyExistsOfferedCourse = await EnrolledCurseModel.findOne({
+  //   offeredCourse: payload?.offeredCourse,
+  //   semesterRegistration: isOfferedCourseExits?.semesterRegistration,
+  //   student: student?._id,
+  // });
 
-  if (studentAlreadyExists) {
+  // if (studentAlreadyExistsOfferedCourse) {
+  //   throw new AppError(
+  //     httpStatus.CONFLICT,
+  //     'Student already enrolled the course!',
+  //   );
+  // }
+
+  //* step3
+  // find find  enrolled course
+  // find existing course credit
+  // find current course credit
+  // find maxCredit from semesterRegistration
+
+  const course = await CourseModel.findById(isOfferedCourseExits.course).select(
+    'credits',
+  );
+
+  if (!course) {
+    throw new AppError(httpStatus.NOT_FOUND, 'course not found!');
+  }
+
+  const semesterRegistration = await SemesterRegistrationModel.findById(
+    isOfferedCourseExits.semesterRegistration,
+  );
+
+  if (!semesterRegistration) {
+    throw new AppError(httpStatus.NOT_FOUND, 'semesterRegistration not found!');
+  }
+
+  const enrolledCourse = await EnrolledCurseModel.aggregate([
+    {
+      $match: {
+        student: student._id,
+        semesterRegistration: isOfferedCourseExits.semesterRegistration,
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'courseData',
+      },
+    },
+    {
+      $unwind: '$courseData',
+    },
+    {
+      $group: {
+        _id: null,
+        existingCredit: { $sum: '$courseData.credits' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        existingCredit: 1,
+      },
+    },
+  ]);
+
+  const maxCredit = semesterRegistration.maxCredit;
+  const existingCourseCredit = enrolledCourse[0]?.existingCredit;
+  const currentCourseCredit = course.credits;
+  const totalCourseCredit = existingCourseCredit + currentCourseCredit;
+
+  if (totalCourseCredit && maxCredit && totalCourseCredit > maxCredit) {
     throw new AppError(
-      httpStatus.CONFLICT,
-      'Student already enrolled the course!',
+      httpStatus.BAD_REQUEST,
+      `You can't enroll. Your total credit (${totalCourseCredit}) exceeds the max allowed (${maxCredit}).`,
     );
   }
 
-  //* step-4
+  // //* step4
   const session = await mongoose.startSession();
 
   try {
@@ -96,3 +164,39 @@ const createEnrolledCourse = async (
 export const enrolledCourseService = {
   createEnrolledCourse,
 };
+
+//* step3
+// find find  enrolled course
+// find existing course credit
+// find current course credit
+// find maxCredit from semesterRegistration
+
+// const enrolledCourse = await EnrolledCurseModel.find({
+//   student: student._id,
+//   semesterRegistration: isOfferedCourseExits.semesterRegistration,
+// }).populate('course');
+
+// const existingCourseCredit = enrolledCourse.reduce((prev, item) => {
+//   const course = item.course as { credits: number };
+//   return prev + (course.credits || 0);
+// }, 0);
+
+// const currentCourseCredit = isOfferedCourseExits.course.credits as number;
+// const totalCourseCredits = existingCourseCredit + currentCourseCredit;
+
+// const semesterRegistration = await SemesterRegistrationModel.findById(
+//   isOfferedCourseExits.semesterRegistration,
+// );
+
+// if (!semesterRegistration) {
+//   throw new AppError(httpStatus.NOT_FOUND, 'semesterRegistration not found!');
+// }
+
+// console.log(enrolledCourse, existingCourseCredit, totalCourseCredits);
+
+// if (totalCourseCredits > semesterRegistration.maxCredit) {
+//   throw new AppError(
+//     httpStatus.BAD_REQUEST,
+//     `You can't enroll. Your total credit (${totalCourseCredits}) exceeds the max allowed (${semesterRegistration.maxCredit}).`,
+//   );
+// }
