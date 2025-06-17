@@ -9,7 +9,7 @@ const userSchema = new Schema<TUser>(
     email: { type: String },
     password: { type: String, select: 0 },
     needsPasswordChange: { type: Boolean, default: true },
-    role: { type: String, enum: ['student', 'faculty', 'admin'] },
+    role: { type: String, enum: ['student', 'faculty', 'admin', 'superAdmin'] },
     status: {
       type: String,
       enum: ['in-progress', 'blocked'],
