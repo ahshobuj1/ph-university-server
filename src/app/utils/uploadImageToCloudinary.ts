@@ -9,16 +9,6 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, process.cwd() + '/uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + '-' + uniqueSuffix);
-  },
-});
-
 export const uploadImageToCloudinary = async (
   path: string,
   imageName: string,
@@ -30,12 +20,22 @@ export const uploadImageToCloudinary = async (
 
     // delete tmp file from uploads
     await fs.unlink(path);
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (error) {
     await fs.unlink(path);
     throw error;
   }
 };
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, process.cwd() + '/uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + '-' + uniqueSuffix);
+  },
+});
 
 export const upload = multer({ storage: storage });

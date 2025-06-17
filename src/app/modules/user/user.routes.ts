@@ -13,7 +13,7 @@ const router = Router();
 
 router.post(
   '/create-student',
-  auth(UserRole.admin),
+  auth(UserRole.superAdmin, UserRole.admin),
   upload.single('file'),
   formDataToJSON,
   validationChecker(studentValidations.createStudentValidationsSchema),

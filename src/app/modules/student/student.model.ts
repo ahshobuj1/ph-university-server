@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { Schema, model } from 'mongoose';
 import { StaticsStudentModel, TStudent } from './student.interface';
 import { AppError } from '../../errors/AppError';
+import config from '../../config';
 
 const nameSchema = new Schema({
   firstName: {
@@ -29,7 +30,7 @@ const studentSchema = new Schema<TStudent, StaticsStudentModel>(
     id: { type: String, unique: true },
     name: { type: nameSchema, required: true },
     email: { type: String, required: true },
-    profileImg: { type: String },
+    profileImg: { type: String, default: config.default_profile_image },
     user: { type: Schema.Types.ObjectId, unique: true, ref: 'User' },
     semester: { type: Schema.Types.ObjectId, ref: 'Semester' },
     department: { type: Schema.Types.ObjectId, ref: 'Department' },

@@ -33,8 +33,15 @@ const createStudent = async (
     const generatedStudentId = await createStudentId(getSemester!);
 
     // upload image to cloudinary
-    const imageName = `${student?.name?.firstName}-${generatedStudentId}`;
-    const { secure_url } = await uploadImageToCloudinary(file.path, imageName);
+    if (file) {
+      const imageName = `${student?.name?.firstName}-${generatedStudentId}`;
+      const { secure_url } = await uploadImageToCloudinary(
+        file.path,
+        imageName,
+      );
+
+      student.profileImg = secure_url;
+    }
 
     const userData: Partial<TUser> = {
       id: generatedStudentId,
@@ -52,7 +59,6 @@ const createStudent = async (
 
     student.id = createUser[0].id;
     student.user = createUser[0]._id;
-    student.profileImg = secure_url;
 
     const newStudent = await StudentModel.create([student], { session });
     if (!newStudent.length) {
