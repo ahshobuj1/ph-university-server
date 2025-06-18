@@ -34,6 +34,16 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await userService.getAllUser(req?.query);
+
+  sendResponse(res, {
+    message: 'All users retrieved successfully',
+    meta: result?.meta,
+    result: result?.result,
+  });
+});
+
 const getMe = catchAsync(async (req, res) => {
   const token = req.user;
   const result = await userService.getMe(token);
@@ -60,4 +70,5 @@ export const userController = {
   createAdmin,
   getMe,
   changeUserStatus,
+  getAllUser,
 };

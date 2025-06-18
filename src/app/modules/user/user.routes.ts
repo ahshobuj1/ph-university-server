@@ -39,11 +39,21 @@ router.post(
   userController.createAdmin,
 );
 
-router.post('/me', auth('admin', 'faculty', 'student'), userController.getMe);
+router.get(
+  '/',
+  auth(UserRole.superAdmin, UserRole.admin),
+  userController.getAllUser,
+);
+
+router.post(
+  '/me',
+  auth(UserRole.superAdmin, UserRole.admin, UserRole.student),
+  userController.getMe,
+);
 
 router.patch(
   '/change-status/:id',
-  // auth('admin', 'superAdmin'),
+  auth(UserRole.superAdmin, UserRole.admin),
   validationChecker(userValidation.changedUserStatusValidation),
   userController.changeUserStatus,
 );

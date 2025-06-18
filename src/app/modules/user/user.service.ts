@@ -17,6 +17,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { UserRole } from './user.constant';
 import { uploadImageToCloudinary } from '../../utils/uploadImageToCloudinary';
 import { DepartmentModel } from '../department/department.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createStudent = async (
   file: any,
@@ -229,10 +230,25 @@ const changeUserStatus = async (id: string, payload: { status: string }) => {
   return result;
 };
 
+const getAllUser = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(UserModel.find(), query)
+    .search(['id', 'email'])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await userQuery.modelQuery;
+  const meta = await userQuery.countTotal();
+
+  return { meta, result };
+};
+
 export const userService = {
   createStudent,
   createFaculty,
   createAdmin,
   getMe,
   changeUserStatus,
+  getAllUser,
 };
