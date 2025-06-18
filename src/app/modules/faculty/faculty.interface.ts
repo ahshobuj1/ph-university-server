@@ -24,7 +24,7 @@ export type TFaculty = {
   emergencyContact: string;
   localAddress: string;
   permanentAddress: string;
-  profileImage: string;
+  profileImage?: string;
   blood?: TBlood;
   isDeleted?: boolean;
 };

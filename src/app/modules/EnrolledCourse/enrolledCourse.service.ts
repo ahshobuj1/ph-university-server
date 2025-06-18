@@ -178,6 +178,7 @@ const getAllEnrolledCourse = async (query: Record<string, unknown>) => {
 
   const result = await enrolledCourseQuery.modelQuery;
   const meta = await enrolledCourseQuery.countTotal();
+
   return { meta, result };
 };
 
@@ -208,6 +209,7 @@ const getMyEnrolledCourse = async (
 
   const result = await enrolledCourseQuery.modelQuery;
   const meta = await enrolledCourseQuery.countTotal();
+
   return { meta, result };
 };
 

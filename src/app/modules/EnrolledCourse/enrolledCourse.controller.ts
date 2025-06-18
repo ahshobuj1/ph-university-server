@@ -23,7 +23,8 @@ const getAllEnrolledCourse = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Enrolled course retrieved successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 
@@ -37,7 +38,8 @@ const getMyEnrolledCourse = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Enrolled course retrieved successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

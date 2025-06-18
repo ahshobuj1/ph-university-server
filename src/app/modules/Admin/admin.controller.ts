@@ -7,7 +7,8 @@ const getAllAdmin = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Admin is retrieved successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

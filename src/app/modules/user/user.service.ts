@@ -16,6 +16,7 @@ import { AdminModel } from '../Admin/admin.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { UserRole } from './user.constant';
 import { uploadImageToCloudinary } from '../../utils/uploadImageToCloudinary';
+import { DepartmentModel } from '../department/department.model';
 
 const createStudent = async (
   file: any,
@@ -23,6 +24,12 @@ const createStudent = async (
   student: TStudent,
 ) => {
   // complete the operations using Transaction and Rollback
+
+  const isDepartmentExists = await DepartmentModel.findById(student.department);
+
+  if (!isDepartmentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Department not found');
+  }
 
   const getSemester = await SemesterModel.findById(student.semester);
 
@@ -40,7 +47,7 @@ const createStudent = async (
         imageName,
       );
 
-      student.profileImg = secure_url;
+      student.profileImage = secure_url;
     }
 
     const userData: Partial<TUser> = {
@@ -59,6 +66,7 @@ const createStudent = async (
 
     student.id = createUser[0].id;
     student.user = createUser[0]._id;
+    student.academicFaculty = isDepartmentExists?.academicFaculty;
 
     const newStudent = await StudentModel.create([student], { session });
     if (!newStudent.length) {
@@ -76,13 +84,41 @@ const createStudent = async (
   }
 };
 
-const createFaculty = async (password: string, payload: TFaculty) => {
+const createFaculty = async (
+  file: any,
+  password: string,
+  payload: TFaculty,
+) => {
+  // check email already exists
+  const isEmailExist = await FacultyModel.findOne({ email: payload.email });
+
+  if (isEmailExist) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
+
+  const isDepartmentExists = await DepartmentModel.findById(payload.department);
+
+  if (!isDepartmentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Department not found');
+  }
+
   const session = await mongoose.startSession(); // session-> step 1
 
   try {
     session.startTransaction(); // session-> step 2
 
     const generatedFacultyID = await createFacultyId();
+
+    // upload image to cloudinary
+    if (file) {
+      const imageName = `${payload?.name?.firstName}-${generatedFacultyID}`;
+      const { secure_url } = await uploadImageToCloudinary(
+        file.path,
+        imageName,
+      );
+
+      payload.profileImage = secure_url;
+    }
 
     const userData: Partial<TUser> = {
       id: generatedFacultyID,
@@ -99,6 +135,7 @@ const createFaculty = async (password: string, payload: TFaculty) => {
 
     payload.id = createUser[0].id;
     payload.user = createUser[0]._id;
+    payload.academicFaculty = isDepartmentExists?.academicFaculty;
 
     const createFaculty = await FacultyModel.create([payload], { session });
 
@@ -113,13 +150,31 @@ const createFaculty = async (password: string, payload: TFaculty) => {
   }
 };
 
-const createAdmin = async (password: string, payload: TAdmin) => {
+const createAdmin = async (file: any, password: string, payload: TAdmin) => {
+  // check email already exists
+  const isEmailExist = await AdminModel.findOne({ email: payload.email });
+
+  if (isEmailExist) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
+
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
     const generatedAdminId = await createAdminId();
+
+    // upload image to cloudinary
+    if (file) {
+      const imageName = `${payload?.name?.firstName}-${generatedAdminId}`;
+      const { secure_url } = await uploadImageToCloudinary(
+        file.path,
+        imageName,
+      );
+
+      payload.profileImage = secure_url;
+    }
 
     const userData: Partial<TUser> = {
       id: generatedAdminId,
@@ -158,14 +213,20 @@ const getMe = async (token: JwtPayload) => {
   const { id, role } = token;
 
   if (role === UserRole.student) {
-    return await UserModel.findOne({ id, role });
+    return await StudentModel.findOne({ id });
   }
   if (role === UserRole.faculty) {
-    return await UserModel.findOne({ id, role });
+    return await FacultyModel.findOne({ id });
   }
   if (role === UserRole.admin) {
-    return await UserModel.findOne({ id, role });
+    return await AdminModel.findOne({ id });
   }
+};
+
+const changeUserStatus = async (id: string, payload: { status: string }) => {
+  const result = await UserModel.findByIdAndUpdate(id, payload, { new: true });
+
+  return result;
 };
 
 export const userService = {
@@ -173,4 +234,5 @@ export const userService = {
   createFaculty,
   createAdmin,
   getMe,
+  changeUserStatus,
 };

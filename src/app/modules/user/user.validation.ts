@@ -8,6 +8,13 @@ const userValidationSchema = z.object({
     .optional(),
 });
 
+const changedUserStatusValidation = z.object({
+  status: z.enum(['in-progress', 'blocked'], {
+    invalid_type_error: 'Status must be in-progress | blocked ',
+  }),
+});
+
 export const userValidation = {
   userValidationSchema,
+  changedUserStatusValidation,
 };

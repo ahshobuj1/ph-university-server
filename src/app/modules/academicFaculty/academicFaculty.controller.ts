@@ -12,11 +12,12 @@ const createAcademicFaculty = catchAsync(async (req, res) => {
 });
 
 const getAcademicFaculties = catchAsync(async (req, res) => {
-  const result = await academicFacultyService.getAcademicFaculties();
+  const result = await academicFacultyService.getAcademicFaculties(req?.query);
 
   sendResponse(res, {
     message: 'Academic Faculty got successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

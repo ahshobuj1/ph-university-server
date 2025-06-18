@@ -17,7 +17,8 @@ const getAllSemesterRegistration = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Semester registered retrieved successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

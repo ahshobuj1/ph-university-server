@@ -3,6 +3,7 @@ import { AppError } from '../../errors/AppError';
 import { semesterNameCodeMap } from './semester.constant';
 import { TSemester } from './semester.interface';
 import { SemesterModel } from './semester.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createSemester = async (semester: TSemester) => {
   // Validate code Against name
@@ -14,9 +15,18 @@ const createSemester = async (semester: TSemester) => {
   return result;
 };
 
-const getAllSemester = async () => {
-  const result = await SemesterModel.find();
-  return result;
+const getAllSemester = async (query: Record<string, unknown>) => {
+  const SemesterQuery = new QueryBuilder(SemesterModel.find(), query)
+    .search(['name', 'year', 'code'])
+    .filter()
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await SemesterQuery.modelQuery;
+  const meta = await SemesterQuery.countTotal();
+
+  return { meta, result };
 };
 
 const getSemesterById = async (id: string) => {

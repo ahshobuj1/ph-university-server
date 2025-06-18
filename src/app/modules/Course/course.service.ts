@@ -24,7 +24,9 @@ const getAllCourse = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await courseQuery.modelQuery;
-  return result;
+  const meta = await courseQuery.countTotal();
+
+  return { meta, result };
 };
 
 const getSingleCourse = async (id: string) => {
@@ -119,18 +121,27 @@ const deleteCourse = async (id: string) => {
 };
 
 const updateFacultiesWithCourse = async (
-  id: string,
+  courseId: string,
   payload: Partial<TCourseFaculty>,
 ) => {
   // Add faculties from array
   const result = await CourseFacultyModel.findByIdAndUpdate(
-    id,
+    courseId,
     {
-      course: id,
+      course: courseId,
       $addToSet: { faculties: { $each: payload } },
     },
     { upsert: true, new: true },
   );
+
+  return result;
+};
+
+const getFacultiesWithCourse = async (courseId: string) => {
+  // Add faculties from array
+  const result = await CourseFacultyModel.findOne({
+    course: courseId,
+  }).populate('faculties');
 
   return result;
 };
@@ -158,5 +169,6 @@ export const courseService = {
   updateCourse,
   deleteCourse,
   updateFacultiesWithCourse,
+  getFacultiesWithCourse,
   removeFacultiesWithCourse,
 };

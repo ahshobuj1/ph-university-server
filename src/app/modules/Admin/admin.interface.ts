@@ -22,7 +22,7 @@ export type TAdmin = {
   emergencyContact: string;
   localAddress: string;
   permanentAddress: string;
-  profileImage: string;
+  profileImage?: string;
   blood?: TBlood;
   isDeleted?: boolean;
 };

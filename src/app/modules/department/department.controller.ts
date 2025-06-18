@@ -12,11 +12,12 @@ const createDepartment = catchAsync(async (req, res) => {
 });
 
 const getAllDepartments = catchAsync(async (req, res) => {
-  const result = await DepartmentService.getAllDepartments();
+  const result = await DepartmentService.getAllDepartments(req?.query);
 
   sendResponse(res, {
     message: 'Departments got successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

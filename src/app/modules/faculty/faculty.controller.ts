@@ -7,7 +7,8 @@ const getAllFaculty = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Faculty is retrieved successfully',
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

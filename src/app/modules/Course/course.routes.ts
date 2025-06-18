@@ -23,13 +23,18 @@ router.patch(
 router.delete('/:id', courseController.deleteCourse);
 
 router.put(
-  '/:courseId/assign-course',
+  '/:courseId/assign-course-faculties',
   validationChecker(courseValidations.FacultyWithCourseValidation),
   courseController.updateFacultiesWithCourse,
 );
 
+router.get(
+  '/:courseId/get-course-faculties',
+  courseController.getFacultiesWithCourse,
+);
+
 router.patch(
-  '/:courseId/remove-course',
+  '/:courseId/remove-course-faculties',
   validationChecker(courseValidations.FacultyWithCourseValidation),
   courseController.removeFacultiesWithCourse,
 );

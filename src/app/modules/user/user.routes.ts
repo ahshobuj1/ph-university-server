@@ -8,6 +8,7 @@ import auth from '../../middlewares/auth';
 import { UserRole } from './user.constant';
 import { upload } from '../../utils/uploadImageToCloudinary';
 import { formDataToJSON } from '../../utils/formDataToJSON';
+import { userValidation } from './user.validation';
 
 const router = Router();
 
@@ -22,17 +23,29 @@ router.post(
 
 router.post(
   '/create-faculty',
-  auth(UserRole.admin),
+  auth(UserRole.superAdmin, UserRole.admin),
+  upload.single('file'),
+  formDataToJSON,
   validationChecker(facultyValidations.createFacultyValidation),
   userController.createFaculty,
 );
 
 router.post(
-  '/create-admin', //super admin
+  '/create-admin',
+  auth(UserRole.superAdmin),
+  upload.single('file'),
+  formDataToJSON,
   validationChecker(adminValidations.createAdminValidation),
   userController.createAdmin,
 );
 
 router.post('/me', auth('admin', 'faculty', 'student'), userController.getMe);
+
+router.patch(
+  '/change-status/:id',
+  // auth('admin', 'superAdmin'),
+  validationChecker(userValidation.changedUserStatusValidation),
+  userController.changeUserStatus,
+);
 
 export const userRoutes = router;

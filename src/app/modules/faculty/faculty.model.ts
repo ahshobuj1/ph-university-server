@@ -3,6 +3,7 @@ import { model, Schema } from 'mongoose';
 import { TFaculty, TFacultyName } from './faculty.interface';
 import { Blood, Gender } from './faculty.constant';
 import { AppError } from '../../errors/AppError';
+import config from '../../config';
 
 const facultyNameSchema = new Schema<TFacultyName>({
   firstName: { type: String, required: true },
@@ -33,7 +34,7 @@ const facultySchema = new Schema<TFaculty>(
     emergencyContact: { type: String, required: true },
     localAddress: { type: String, required: true },
     permanentAddress: { type: String, required: true },
-    profileImage: { type: String, required: true },
+    profileImage: { type: String, default: config.default_profile_image },
     blood: { type: String, enum: Blood },
     isDeleted: { type: Boolean, default: false },
   },

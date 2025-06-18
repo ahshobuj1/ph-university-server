@@ -21,8 +21,9 @@ import { Model, Types } from 'mongoose';
 export type TStudent = {
   id: string;
   user: Types.ObjectId;
-  profileImg?: string;
+  profileImage?: string;
   semester: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
   department: Types.ObjectId;
   registration: string;
   roll: string;

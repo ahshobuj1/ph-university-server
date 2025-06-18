@@ -16,7 +16,7 @@ const createStudent = catchAsync(async (req, res) => {
 
 const createFaculty = catchAsync(async (req, res) => {
   const { password, faculty } = req.body;
-  const result = await userService.createFaculty(password, faculty);
+  const result = await userService.createFaculty(req.file, password, faculty);
 
   sendResponse(res, {
     message: 'Faculty is created successfully',
@@ -26,7 +26,7 @@ const createFaculty = catchAsync(async (req, res) => {
 
 const createAdmin = catchAsync(async (req, res) => {
   const { password, admin } = req.body;
-  const result = await userService.createAdmin(password, admin);
+  const result = await userService.createAdmin(req.file, password, admin);
 
   sendResponse(res, {
     message: 'Admin is created successfully',
@@ -44,9 +44,20 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+const changeUserStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await userService.changeUserStatus(id, req.body);
+
+  sendResponse(res, {
+    message: 'Changed user status successfully!',
+    result: result,
+  });
+});
+
 export const userController = {
   createStudent,
   createFaculty,
   createAdmin,
   getMe,
+  changeUserStatus,
 };

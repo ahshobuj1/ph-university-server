@@ -25,7 +25,6 @@ const createFacultyValidation = z.object({
     emergencyContact: z.string(),
     localAddress: z.string(),
     permanentAddress: z.string(),
-    profileImage: z.string(),
     blood: z.enum([...Blood] as [string, ...string[]]).optional(),
   }),
 });

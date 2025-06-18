@@ -15,7 +15,7 @@ router.post(
 
 router.get(
   '/',
-  auth('admin', 'faculty'),
+  auth('admin', 'faculty', 'superAdmin'),
   enrolledCourseController.getAllEnrolledCourse,
 );
 
