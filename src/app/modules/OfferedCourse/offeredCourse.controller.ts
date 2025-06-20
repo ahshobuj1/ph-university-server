@@ -25,9 +25,8 @@ const getMyOfferedCourse = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: 'Offered course is retrieved successfully',
-    // meta: result?.meta,
-    // result: result?.result,
-    result,
+    meta: result?.meta,
+    result: result?.result,
   });
 });
 

@@ -160,7 +160,12 @@ const getMyOfferedCourse = async (
 
   // const prerequisitesCheck =  hasFulfilledPrerequisites(courseId: string, studentId: string)
 
-  const result = await OfferedCourseModel.aggregate([
+  // Pagination Data
+  const page = Number(query?.page) || 1;
+  const limit = Number(query?.limit) | 9;
+  const skip = (page - 1) * limit;
+
+  const aggregationQuery = [
     // match
     {
       $match: {
@@ -275,9 +280,34 @@ const getMyOfferedCourse = async (
         isAllReadyEnrolled: false,
       },
     },
+  ];
+
+  const paginationQuery = [
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+  ];
+
+  const result = await OfferedCourseModel.aggregate([
+    ...aggregationQuery,
+    ...paginationQuery,
   ]);
 
-  return result;
+  // pagination data
+  const total = (await OfferedCourseModel.aggregate(aggregationQuery)).length;
+  const totalPage = Math.ceil(total / limit);
+
+  const meta = {
+    total,
+    page,
+    limit,
+    totalPage,
+  };
+
+  return { meta, result };
 };
 
 const getSingleOfferedCourse = async (id: string) => {
