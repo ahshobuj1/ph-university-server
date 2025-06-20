@@ -9,6 +9,7 @@ import { CourseModel } from '../Course/course.model';
 import { DepartmentModel } from '../department/department.model';
 import { hasTimeConflict } from './offeredCourse.utils';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { StudentModel } from '../student/student.model';
 
 const createOfferedCourse = async (payload: TOfferedCourse) => {
   const {
@@ -136,6 +137,149 @@ const getAllOfferedCourse = async (query: Record<string, unknown>) => {
   return { meta, result };
 };
 
+const getMyOfferedCourse = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await StudentModel.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
+  }
+
+  const ongoingSemesterRegistration = await SemesterRegistrationModel.findOne({
+    status: 'ONGOING',
+  });
+
+  if (!ongoingSemesterRegistration) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'There is no Ongoing semester registration here!',
+    );
+  }
+
+  // const prerequisitesCheck =  hasFulfilledPrerequisites(courseId: string, studentId: string)
+
+  const result = await OfferedCourseModel.aggregate([
+    // match
+    {
+      $match: {
+        academicFaculty: student?.academicFaculty,
+        department: student?.department,
+        semesterRegistration: ongoingSemesterRegistration?._id,
+      },
+    },
+    // lookup course
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'courseData',
+      },
+    },
+    // unwind the courseData array
+    {
+      $unwind: '$courseData',
+    },
+    // Join data from the enrolledCourses collection based on 3 conditions
+    {
+      $lookup: {
+        from: 'enrolledcourses',
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$student', student._id] },
+                  {
+                    $eq: [
+                      '$semesterRegistration',
+                      ongoingSemesterRegistration?._id,
+                    ],
+                  },
+                  {
+                    $eq: ['$isEnrolled', true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'enrolledCourses',
+      },
+    },
+    // Join Completed EnrolledCourse data from the enrolledCourses collection for student
+    {
+      $lookup: {
+        from: 'enrolledcourses',
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$student', student._id] },
+                  { $eq: ['$isCompleted', true] },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'completedCourses',
+      },
+    },
+    // Join completedCourseIds data from the completedCourses field
+    {
+      $addFields: {
+        completedCourseIds: {
+          $map: {
+            input: '$completedCourses',
+            as: 'completeEnrolledCourse',
+            in: '$$completeEnrolledCourse.course',
+          },
+        },
+      },
+    },
+    // Join prerequisitesFulFilled and isAllReadyEnrolled data as boolean compare with completedCourseIds and enrolledCourses field
+    {
+      $addFields: {
+        prerequisitesFulFilled: {
+          $or: [
+            { $eq: ['$courseData.preRequisiteCourses', []] },
+            {
+              $setIsSubset: [
+                '$courseData.preRequisiteCourses.course',
+                '$completedCourseIds',
+              ],
+            },
+          ],
+        },
+        isAllReadyEnrolled: {
+          $in: [
+            '$courseData._id',
+            {
+              $map: {
+                input: '$enrolledCourses',
+                as: 'enrolled',
+                in: '$$enrolled.course',
+              },
+            },
+          ],
+        },
+      },
+    },
+    // Match by these condition
+    {
+      $match: {
+        prerequisitesFulFilled: true,
+        isAllReadyEnrolled: false,
+      },
+    },
+  ]);
+
+  return result;
+};
+
 const getSingleOfferedCourse = async (id: string) => {
   const result = await OfferedCourseModel.findById(id)
     .populate('semesterRegistration')
@@ -243,6 +387,7 @@ const deleteOfferedCourse = async (id: string) => {
 export const offeredCourseService = {
   createOfferedCourse,
   getAllOfferedCourse,
+  getMyOfferedCourse,
   getSingleOfferedCourse,
   updateOfferedCourse,
   deleteOfferedCourse,

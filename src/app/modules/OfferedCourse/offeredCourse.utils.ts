@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CourseModel } from '../Course/course.model';
+import { EnrolledCurseModel } from '../EnrolledCourse/enrolledCourse.model';
 import { TDays } from './offeredCourse.interface';
 
 export type TSchedules = {
@@ -18,12 +21,50 @@ export const hasTimeConflict = (
 
     // 07:00 - 09:00
     // 10:00 - 12:00
+
     if (newStartTime < existingEndTime && newEndTime > existingStartTime) {
       return true;
     }
   }
 
   return false;
+};
+
+export const hasFulfilledPrerequisites = async (
+  courseId: string,
+  studentId: string,
+): Promise<boolean> => {
+  // Step 1: Fetch course by ID
+  const course = await CourseModel.findById(courseId); // assume courseId is provided
+
+  // Step 2: Get prerequisite course IDs
+  const preRequisiteCourseIds = course?.preRequisiteCourses?.map((item: any) =>
+    item.course.toString(),
+  );
+
+  // Step 3: Fetch completed courses of student
+  const completedCourses = await EnrolledCurseModel.find({
+    student: studentId,
+    isEnrolled: true,
+  }).select('course'); // only course field is needed
+
+  const completedCourseIds = completedCourses.map((item) =>
+    item.course.toString(),
+  );
+
+  // Step 4: Check if prerequisites are fulfilled
+  let isPreRequisitesFulFilled = false;
+
+  if (!preRequisiteCourseIds || preRequisiteCourseIds.length === 0) {
+    isPreRequisitesFulFilled = true;
+  } else {
+    // Check if every prerequisite is in completed list
+    isPreRequisitesFulFilled = preRequisiteCourseIds.every((id) =>
+      completedCourseIds.includes(id),
+    );
+  }
+
+  return isPreRequisitesFulFilled;
 };
 
 // export const hasTimeConflict = (

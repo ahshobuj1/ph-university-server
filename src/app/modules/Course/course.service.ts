@@ -33,6 +33,7 @@ const getSingleCourse = async (id: string) => {
   const result = await CourseModel.findById(id).populate(
     'preRequisiteCourses.course',
   );
+
   return result;
 };
 

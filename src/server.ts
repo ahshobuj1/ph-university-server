@@ -8,10 +8,9 @@ let server: Server;
 
 async function main() {
   try {
-    await mongoose.connect(
-      config.database_url as string,
-      // {dbName: 'PH-University'}
-    );
+    await mongoose.connect(config.database_url as string, {
+      dbName: 'PH-University',
+    });
 
     await seedSuperAdmin();
 
