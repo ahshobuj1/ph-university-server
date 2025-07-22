@@ -24,5 +24,10 @@ router.get(
   auth(UserRole.admin, UserRole.superAdmin, UserRole.faculty, UserRole.student),
   academicFacultyController.getSingleAcademicFaculty,
 );
+router.delete(
+  '/:id',
+  auth(UserRole.admin, UserRole.superAdmin, UserRole.faculty, UserRole.student),
+  academicFacultyController.deleteAcademicFaculty,
+);
 
 export const academicFacultyRoutes = router;

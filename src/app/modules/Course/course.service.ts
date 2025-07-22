@@ -8,13 +8,24 @@ import { CourseFacultyModel, CourseModel } from './course.model';
 import mongoose from 'mongoose';
 
 const createCourse = async (payload: Partial<TCourse>) => {
+  const isCodeExists = await CourseModel.findOne({ code: payload.code });
+
+  if (isCodeExists) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Code ${payload.code} already exists!`,
+    );
+  }
+
   const result = await CourseModel.create(payload);
   return result;
 };
 
 const getAllCourse = async (query: Record<string, unknown>) => {
   const courseQuery = new QueryBuilder(
-    CourseModel.find().populate('preRequisiteCourses.course'),
+    CourseModel.find({ isDeleted: !true }).populate(
+      'preRequisiteCourses.course',
+    ),
     query,
   )
     .search(courseSearchableFields)

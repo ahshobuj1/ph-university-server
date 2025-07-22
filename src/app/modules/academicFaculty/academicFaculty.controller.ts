@@ -31,8 +31,19 @@ const getSingleAcademicFaculty = catchAsync(async (req, res) => {
   });
 });
 
+const deleteAcademicFaculty = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await academicFacultyService.deleteAcademicFaculty(id);
+
+  sendResponse(res, {
+    message: 'Academic Faculty  deleted successfully',
+    result,
+  });
+});
+
 export const academicFacultyController = {
   createAcademicFaculty,
   getAcademicFaculties,
   getSingleAcademicFaculty,
+  deleteAcademicFaculty,
 };
