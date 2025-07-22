@@ -23,6 +23,7 @@ const createAdminValidation = z.object({
     email: z.string(),
     contact: z.string(),
     emergencyContact: z.string(),
+    profileImage: z.string().optional(),
     localAddress: z.string(),
     permanentAddress: z.string(),
     blood: z.enum([...Blood] as [string, ...string[]]).optional(),

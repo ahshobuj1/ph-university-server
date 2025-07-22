@@ -15,15 +15,10 @@ import { TAdmin } from '../Admin/admin.interface';
 import { AdminModel } from '../Admin/admin.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { UserRole } from './user.constant';
-import { uploadImageToCloudinary } from '../../utils/uploadImageToCloudinary';
 import { DepartmentModel } from '../department/department.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const createStudent = async (
-  file: any,
-  password: string,
-  student: TStudent,
-) => {
+const createStudent = async (password: string, student: TStudent) => {
   // complete the operations using Transaction and Rollback
 
   const isDepartmentExists = await DepartmentModel.findById(student.department);
@@ -41,15 +36,15 @@ const createStudent = async (
     const generatedStudentId = await createStudentId(getSemester!);
 
     // upload image to cloudinary
-    if (file) {
-      const imageName = `${student?.name?.firstName}-${generatedStudentId}`;
-      const { secure_url } = await uploadImageToCloudinary(
-        file.path,
-        imageName,
-      );
+    // if (file) {
+    //   const imageName = `${student?.name?.firstName}-${generatedStudentId}`;
+    //   const { secure_url } = await uploadImageToCloudinary(
+    //     file.path,
+    //     imageName,
+    //   );
 
-      student.profileImage = secure_url;
-    }
+    //   student.profileImage = secure_url;
+    // }
 
     const userData: Partial<TUser> = {
       id: generatedStudentId,
@@ -85,11 +80,7 @@ const createStudent = async (
   }
 };
 
-const createFaculty = async (
-  file: any,
-  password: string,
-  payload: TFaculty,
-) => {
+const createFaculty = async (password: string, payload: TFaculty) => {
   // check email already exists
   const isEmailExist = await FacultyModel.findOne({ email: payload.email });
 
@@ -111,15 +102,15 @@ const createFaculty = async (
     const generatedFacultyID = await createFacultyId();
 
     // upload image to cloudinary
-    if (file) {
-      const imageName = `${payload?.name?.firstName}-${generatedFacultyID}`;
-      const { secure_url } = await uploadImageToCloudinary(
-        file.path,
-        imageName,
-      );
+    // if (file) {
+    //   const imageName = `${payload?.name?.firstName}-${generatedFacultyID}`;
+    //   const { secure_url } = await uploadImageToCloudinary(
+    //     file.path,
+    //     imageName,
+    //   );
 
-      payload.profileImage = secure_url;
-    }
+    //   payload.profileImage = secure_url;
+    // }
 
     const userData: Partial<TUser> = {
       id: generatedFacultyID,
@@ -151,7 +142,7 @@ const createFaculty = async (
   }
 };
 
-const createAdmin = async (file: any, password: string, payload: TAdmin) => {
+const createAdmin = async (password: string, payload: TAdmin) => {
   // check email already exists
   const isEmailExist = await AdminModel.findOne({ email: payload.email });
 
@@ -167,15 +158,15 @@ const createAdmin = async (file: any, password: string, payload: TAdmin) => {
     const generatedAdminId = await createAdminId();
 
     // upload image to cloudinary
-    if (file) {
-      const imageName = `${payload?.name?.firstName}-${generatedAdminId}`;
-      const { secure_url } = await uploadImageToCloudinary(
-        file.path,
-        imageName,
-      );
+    // if (file) {
+    //   const imageName = `${payload?.name?.firstName}-${generatedAdminId}`;
+    //   const { secure_url } = await uploadImageToCloudinary(
+    //     file.path,
+    //     imageName,
+    //   );
 
-      payload.profileImage = secure_url;
-    }
+    //   payload.profileImage = secure_url;
+    // }
 
     const userData: Partial<TUser> = {
       id: generatedAdminId,
@@ -226,7 +217,6 @@ const getMe = async (token: JwtPayload) => {
 
 const changeUserStatus = async (id: string, payload: { status: string }) => {
   const result = await UserModel.findByIdAndUpdate(id, payload, { new: true });
-
   return result;
 };
 

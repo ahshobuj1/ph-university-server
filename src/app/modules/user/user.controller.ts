@@ -3,10 +3,10 @@ import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
 
 const createStudent = catchAsync(async (req, res) => {
-  // console.log(req.file);
+  // const file = req.file;
 
   const { password, student } = req.body;
-  const result = await userService.createStudent(req.file, password, student);
+  const result = await userService.createStudent(password, student);
 
   sendResponse(res, {
     message: 'Student is created successfully',
@@ -15,8 +15,9 @@ const createStudent = catchAsync(async (req, res) => {
 });
 
 const createFaculty = catchAsync(async (req, res) => {
+  // const file = req.file;
   const { password, faculty } = req.body;
-  const result = await userService.createFaculty(req.file, password, faculty);
+  const result = await userService.createFaculty(password, faculty);
 
   sendResponse(res, {
     message: 'Faculty is created successfully',
@@ -25,8 +26,10 @@ const createFaculty = catchAsync(async (req, res) => {
 });
 
 const createAdmin = catchAsync(async (req, res) => {
+  // const file = req.file;
+
   const { password, admin } = req.body;
-  const result = await userService.createAdmin(req.file, password, admin);
+  const result = await userService.createAdmin(password, admin);
 
   sendResponse(res, {
     message: 'Admin is created successfully',

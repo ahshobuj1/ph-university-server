@@ -51,13 +51,15 @@ const loginUser = async (payload: TLoginUser) => {
   };
 
   const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: '10d',
+    expiresIn: config.jwt_access_expires_in as jwt.SignOptions['expiresIn'],
   });
 
   const refreshToken = jwt.sign(
     jwtPayload,
     config.jwt_refresh_secret as string,
-    { expiresIn: '365d' },
+    {
+      expiresIn: config.jwt_refresh_expires_in as jwt.SignOptions['expiresIn'],
+    },
   );
 
   return {
@@ -119,6 +121,10 @@ const changePassword = async (
 const refreshToken = async (token: string) => {
   // console.log(token);
 
+  // if (!token) {
+  //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+  // }
+
   // verify token
   const decoded = jwt.verify(
     token,
@@ -166,7 +172,7 @@ const refreshToken = async (token: string) => {
   };
 
   const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: '10d',
+    expiresIn: config.jwt_access_expires_in as jwt.SignOptions['expiresIn'],
   });
 
   return { accessToken };

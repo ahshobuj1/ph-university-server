@@ -12,6 +12,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   err,
   req,
   res,
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   next,
 ) => {
   let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
@@ -58,7 +59,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
     success: false,
     message,
     errorSources,
-    stack: config.node_env === 'development' ? err?.stack : null,
+    stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 
   // send error res with this pattern

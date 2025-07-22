@@ -65,6 +65,7 @@ const createStudentValidationsSchema = z.object({
   password: z.string().optional(),
   student: z.object({
     name: createNameValidation,
+    profileImage: z.string().optional(),
     email: z
       .string({
         required_error: 'Email is required',

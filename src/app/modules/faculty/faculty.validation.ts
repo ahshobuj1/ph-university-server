@@ -16,6 +16,7 @@ const facultyNameValidation = z.object({
 const createFacultyValidation = z.object({
   password: z.string().optional(),
   faculty: z.object({
+    profileImage: z.string().optional(),
     designation: z.string(),
     name: facultyNameValidation,
     gender: z.enum([...Gender] as [string, ...string[]]),
